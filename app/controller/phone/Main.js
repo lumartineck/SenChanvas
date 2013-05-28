@@ -59,10 +59,11 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 cnt = Ext.getCmp('draggsCnt');
             console.log('connnn',cnt)
             cnt.add({
-                xtype: 'component',
+                xtype: 'image',
                 draggable: true,
-                html: '<img src="'+src+'" width="50" height="50">',
-                src: src
+                src: src,
+                height: 100,
+                width: 100
             });
         });
     },
@@ -130,7 +131,6 @@ Ext.define('SenChanvas.controller.phone.Main', {
         var me = this;
         console.log('Dropped', arguments);
 
-        var draggsCnt = me.getDraggsCnt();
         var dropCnt = me.getDropCnt();
         var dragg = Ext.getCmp(draggable.getElement().getId());
         console.log('AQUI', dragg, draggable);
@@ -139,21 +139,20 @@ Ext.define('SenChanvas.controller.phone.Main', {
             dropCnt.setHtml('');
             droppable.cleared = true;
         }
-        console.log('dragggg...',dragg._src);
+        console.log('dragggerrr...',dragg);
         var x = dragg.getInnerHtmlElement().getX(),
             y = dragg.getInnerHtmlElement().getY(),
             src = dragg._src,
             newImage = dropCnt.add({
-                xtype: 'component',
-                top: y,//Falta poner dinamico el x y y
-                left: x,
+                xtype: 'image',
                 draggable: true,
-                html: '<img src="'+src+'" width="150" height="150">',
-                width: 150,
-                height: 150
-                //style: "background-image: url('./resources/images/001.jpg');"
+                src: src,
+                height: 100,
+                width: 100,
+                top: 10,//Falta poner dinamico el x y y
+                left: 10
             });
-        me.addListeners(newImage, x, y);
+        me.addListeners(newImage, 10, 10);
         dragg.destroy();
     },
 
@@ -236,7 +235,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 });
             } else {
                 item.setStyle({
-                    border: '0px'
+                    border: '5px'
                 });
             }
         });
