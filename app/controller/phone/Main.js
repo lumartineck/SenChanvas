@@ -23,6 +23,21 @@ Ext.define('SenChanvas.controller.phone.Main', {
             },
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
+            },
+            '#principalPanel button[action=rotateR]': {
+                tap:'onButtonRotateRTap'
+            },
+            '#principalPanel button[action=rotateL]': {
+                tap:'onButtonRotateLTap'
+            },
+            '#principalPanel button[action=toFront]': {
+                tap:'onButtonToFrontTap'
+            },
+            '#principalPanel button[action=toBack]': {
+                tap:'onButtonToBackTap'
+            },
+            '#principalPanel button[action=delete]': {
+                tap:'onButtonDeleteTap'
             }
         }
     },
@@ -217,5 +232,22 @@ Ext.define('SenChanvas.controller.phone.Main', {
             }
         });
         // Ext.get("image-"+record.get('id')).hide();
+    },
+
+
+    onButtonRotateRTap:function(){
+        console.log('rotateR');
+    },
+    onButtonRotateLTap:function(){
+        console.log('rotateL');
+    },
+    onButtonToFrontTap:function(){
+        console.log('frotn');
+    },
+    onButtonToBackTap:function(){
+        console.log('back');
+    },
+    onButtonDeleteTap:function(){
+        console.log('delete');
     }
 });
