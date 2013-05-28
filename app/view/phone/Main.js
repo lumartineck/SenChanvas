@@ -39,6 +39,16 @@ Ext.define('SenChanvas.view.phone.Main', {
                         width: 300,
                         height: 300,
                         style: 'background: red'
+                    },
+                    {
+                        xtype:'component',
+                        html: 'Pinch me',
+                        itemId:'blueSquare',
+                        top: 10,
+                        left: 200,
+                        width: 300,
+                        height: 300,
+                        style: 'background: blue'
                     }
                 ]
             }
