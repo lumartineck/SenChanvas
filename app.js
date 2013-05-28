@@ -1,7 +1,8 @@
 //<debug>
 Ext.Loader.setPath({
     'Ext': '../touch/src',
-    'SenChanvas': 'app'
+    'SenChanvas': 'app',
+    'Ext.ux': './ux'
 });
 //</debug>
 
@@ -9,10 +10,14 @@ Ext.application({
     name: 'SenChanvas',
 
     requires: [
-        'Ext.MessageBox'
+        'Ext.MessageBox',
+        'Ext.util.Draggable',
+        'Ext.ux.util.Draggable',
+        'Ext.ux.util.Droppable'
     ],
 
     profiles: ['Tablet', 'Phone'],
+    stores:['Images'],
 
     icon: {
         '57': 'resources/icons/Icon.png',
