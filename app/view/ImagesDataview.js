@@ -21,7 +21,7 @@ Ext.define('SenChanvas.view.ImagesDataview', {
         itemTpl: [
                 '<div class="image-dataview-item" id="image-{id}">',
                 	'<div class="image" style="margin:5px;">',
-                		'<img src="{src}" style="width:70px; height:70px">',
+                		'<img src="{src}" style="width:50px; height:50px">',
                 	'</div>',
                 '</div>'
         ]

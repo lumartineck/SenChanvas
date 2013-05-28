@@ -229,7 +229,6 @@ Ext.define('Ext.ux.util.Droppable', {
                                     var cmp = Ext.getCmp(x);
                                     if (cmp){
                                     var draggable = cmp.getDraggableBehavior().draggable;
-                                        alert('dropableee...');
                                     this.draggables.push(draggable);
                                     }
                                 }

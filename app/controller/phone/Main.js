@@ -21,6 +21,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
             draggsCnt: {
                 initialize: 'onDraggsCntInit'
             },
+            /*dropCnt: {
+                initialize: 'onDropCntInit'
+            },*/
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             },
@@ -43,25 +46,18 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     init: function() {
-       var images = Ext.getStore('Images');
-        images.load();
-
-        images.on('load',this.onDraggsCntInit.bind(this));
-
+        Ext.getStore('Images').load();
     },
 
     onDraggsCntInit: function(cnt) {
-        alert(433);
-        var me = this;
-        console.log('dragggg', cnt);
-
+        var me = this,
+            drop = me.getDropCnt();
+        console.log('Init draggs');
         cnt.on('painted',function(){
             Ext.each(cnt.getInnerItems(), function(item) {
-                console.log('itemmmm', item);
                 if (Ext.isDefined(item.draggableBehavior)) {
-                    alert(242);
                     var draggable = item.draggableBehavior.getDraggable();
-                    console.log('draggable', draggable);
+
                     draggable.group = 'base';// Default group for droppable
                     draggable.revert = true;
 
@@ -78,7 +74,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 }
             });
         });
-        cnt.on('painted', me.onDropCntInit.bind(me));
+
+        me.onDropCntInit();
     },
 
     onDragStart: function() {
@@ -91,13 +88,14 @@ Ext.define('SenChanvas.controller.phone.Main', {
         console.log('End of dragging', arguments);
     },
 
-    onDropCntInit: function(cnt) {
-        var me = this;
+    onDropCntInit: function() {
+        var me = this,
+            el = Ext.getCmp('dropable');
 
         var drop = Ext.create('Ext.ux.util.Droppable', {
-            element: 'dropable'
+            element: el.element
         });
-
+console.log('drop..', drop);
         drop.on({
             scope: me,
             drop: me.onDrop
@@ -109,6 +107,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     onDrop: function(droppable, draggable) {
+        alert('has ganadooo..')
         var me = this;
         console.log('Dropped', arguments);
 
@@ -219,6 +218,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             threshold: 0,
             //direction: 'vertical',
             animationDuration: 100,
+            draggable: true,
             listeners:{
                 drag:function  () {
                     console.log('drag');
