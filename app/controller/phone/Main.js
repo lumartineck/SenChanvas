@@ -133,6 +133,7 @@ console.log('drop..', drop);
         var draggsCnt = me.getDraggsCnt();
         var dropCnt = me.getDropCnt();
         var dragg = Ext.getCmp(draggable.getElement().getId());
+        console.log('AQUI', dragg, draggable);
 
         if (!droppable.cleared) {
             dropCnt.setHtml('');
@@ -140,15 +141,15 @@ console.log('drop..', drop);
         }
         var x = dragg.getInnerHtmlElement().getX(),
             y = dragg.getInnerHtmlElement().getY(),
-            src = dragg.src,
+            src = dragg.getSrcImage(),
             newImage = dropCnt.add({
             xtype: 'component',
             top: y,//Falta poner dinamico el x y y
             left: x,
             draggable: true,
-            html: '<img src="'+src+'" width="50" height="50">'
-            //width: 50,
-            //height: 50,
+            html: '<img src="'+src+'" width="150" height="150">',
+            width: 150,
+            height: 150
             //style: "background-image: url('./resources/images/001.jpg');"
         });
         me.addListeners(newImage, x, y);
@@ -226,7 +227,7 @@ console.log('drop..', drop);
     setSelectedImage:function(image){
         var me =this,
             dropCnt = me.getDropCnt();
-        console.log('setSelected', dropCnt.getItems().items);
+        //console.log('setSelected', dropCnt.getItems().items);
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
                 item.setStyle({
