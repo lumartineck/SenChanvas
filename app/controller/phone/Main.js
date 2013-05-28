@@ -124,25 +124,24 @@ console.log('drop..', drop);
 
         var newImage = dropCnt.add({
             xtype: 'component',
-            html: 'Pinch me',
             top: 10,//Falta poner dinamico el x y y
             left: 10,
             width: 200,
             height: 200,
-            style: 'background-image: green'
+            style: "background-image: url('./resources/images/001.jpg');"
         });
         me.addListeners(newImage, 10, 10);
         dragg.destroy();
     },
 
     onShowPrincipal: function (c) {
-        console.log(c);
+        /*console.log(c);
         var me = this,
             redSquare = c.down('#redSquare'),
             blueSquare = c.down('#blueSquare');
 
         me.addListeners(redSquare, 10, 10);
-        me.addListeners(blueSquare, 200, 10);
+        me.addListeners(blueSquare, 200, 10);*/
     },
 
     addListeners:function(image, x, y){

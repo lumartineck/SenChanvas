@@ -62,7 +62,7 @@ Ext.define('SenChanvas.view.phone.Main', {
                             'border' : 'solid 3px #3CA9D0',
                             'border-radius' : '5px'
                         },
-                        margin: '3 5 3 5',
+                        margin: '3 5 3 5'/*,
                         items: [
                             {
                                 xtype: 'component',
@@ -83,7 +83,7 @@ Ext.define('SenChanvas.view.phone.Main', {
                                 width: 300,
                                 height: 300,
                                 style: 'background: blue'}
-                        ]
+                        ]*/
                     },
                     {
                         xtype: 'container',
@@ -97,7 +97,7 @@ Ext.define('SenChanvas.view.phone.Main', {
                         },{
                             xtype: 'component',
                             draggable: true,
-                            html: '<img src="./resources/images/001.jpg" width="50" height="50">'
+                            html: '<img src="./resources/images/002.jpg" width="50" height="50">'
                         }]
                     }
                 ]
