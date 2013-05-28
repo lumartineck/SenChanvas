@@ -27,39 +27,39 @@ Ext.define('SenChanvas.view.phone.Main', {
         items: [
             {
                 xtype: 'panel',
-                //id:'principalPanel',
+                id:'principalPanel',
                 title: 'Fancy',
                 layout: 'vbox',
                 items: [
                     {
-<<<<<<< HEAD
-                        xtype:'container',
+                        xtype: 'container',
                         id: 'dropable',
-                        flex: 4
-                    },{
-                        xtype:'imagesdataview',
-                        id: 'draggsCnt',
-                        flex:1
-=======
-                        xtype:'component',
-                        html: 'Pinch me',
-                        itemId:'redSquare',
-                        top: 10,
-                        left: 10,
-                        width: 300,
-                        height: 300,
-                        style: 'background: red'
+                        flex: 4,
+                        items: [
+                            {xtype: 'component',
+                                html: 'Pinch me',
+                                itemId: 'redSquare',
+                                top: 10,
+                                left: 10,
+                                width: 300,
+                                height: 300,
+                                style: 'background: red'
+                            },
+                            {
+                                xtype: 'component',
+                                html: 'Pinch me',
+                                itemId: 'blueSquare',
+                                top: 10,
+                                left: 200,
+                                width: 300,
+                                height: 300,
+                                style: 'background: blue'}
+                        ]
                     },
                     {
-                        xtype:'component',
-                        html: 'Pinch me',
-                        itemId:'blueSquare',
-                        top: 10,
-                        left: 200,
-                        width: 300,
-                        height: 300,
-                        style: 'background: blue'
->>>>>>> origin/master
+                        xtype: 'imagesdataview',
+                        id: 'draggsCnt',
+                        flex: 1
                     }
                 ]
             }
