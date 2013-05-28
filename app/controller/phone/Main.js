@@ -22,9 +22,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
             draggsCnt: {
                 initialize: 'onDraggsCntInit'
             },
-            dropCnt: {
+            /*dropCnt: {
                 initialize: 'onDropCntInit'
-            },
+            },*/
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             },
@@ -47,38 +47,36 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     init: function() {
-       var images = Ext.getStore('Images').load();
-
-        images.on('load',this.onDraggsCntInit.bind(this));
-
+        Ext.getStore('Images').load();
     },
 
     onDraggsCntInit: function(cnt) {
         var me = this,
-            drag = me.getDraggsCnt();
-        console.log('dragggg', drag);
+            drop = me.getDropCnt();
+        console.log('Init draggs');
+        cnt.on('painted',function(){
+            Ext.each(cnt.getInnerItems(), function(item) {
+                if (Ext.isDefined(item.draggableBehavior)) {
+                    var draggable = item.draggableBehavior.getDraggable();
 
-        Ext.each(cnt.getInnerItems(), function(item) {
-            if (Ext.isDefined(item.draggableBehavior)) {
-                var draggable = item.draggableBehavior.getDraggable();
-                console.log('draggable', draggable);
-                draggable.group = 'base';// Default group for droppable
-                draggable.revert = true;
+                    draggable.group = 'base';// Default group for droppable
+                    draggable.revert = true;
 
-                draggable.setConstraint({
-                    min: { x: -Infinity, y: -Infinity },
-                    max: { x: Infinity, y: Infinity }
-                });
+                    draggable.setConstraint({
+                        min: { x: -Infinity, y: -Infinity },
+                        max: { x: Infinity, y: Infinity }
+                    });
 
-                draggable.on({
-                    scope: me,
-                    dragstart: me.onDragStart,
-                    dragend: me.onDragEnd
-                });
-            }
+                    draggable.on({
+                        scope: me,
+                        dragstart: me.onDragStart,
+                        dragend: me.onDragEnd
+                    });
+                }
+            });
         });
 
-        cnt.on('painted', me.onDropCntInit.bind(me));
+        me.onDropCntInit();
     },
 
     onDragStart: function() {
@@ -93,12 +91,12 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
     onDropCntInit: function() {
         var me = this,
-            dropCnt = me.getDropCnt();
+            el = Ext.getCmp('dropable');
 
         var drop = Ext.create('Ext.ux.util.Droppable', {
-            element: dropCnt.element
+            element: el.element
         });
-
+console.log('drop..', drop);
         drop.on({
             scope: me,
             drop: me.onDrop
@@ -110,6 +108,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     onDrop: function(droppable, draggable) {
+        alert('has ganadooo..')
         var me = this;
         console.log('Dropped', arguments);
 
@@ -240,6 +239,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             threshold: 0,
             //direction: 'vertical',
             animationDuration: 100,
+            draggable: true,
             listeners:{
                 drag:function  () {
                     console.log('drag');

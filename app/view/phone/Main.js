@@ -86,14 +86,19 @@ Ext.define('SenChanvas.view.phone.Main', {
                         ]
                     },
                     {
-                        xtype: 'imagesdataview',
+                        xtype: 'container',
                         id: 'draggsCnt',
+                        layout: 'hbox',
                         flex: 1,
-                        style: {
-                            'border' : 'solid 1px #D7D9DE',
-                            'border-radius' : '9px'
-                        },
-                        margin: '3 5 3 5'
+                        items: [{
+                            xtype: 'component',
+                            draggable: true,
+                            html: '<img src="./resources/images/001.jpg" width="50" height="50">'
+                        },{
+                            xtype: 'component',
+                            draggable: true,
+                            html: '<img src="./resources/images/001.jpg" width="50" height="50">'
+                        }]
                     }
                 ]
             }
