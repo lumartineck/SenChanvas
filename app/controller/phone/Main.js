@@ -21,9 +21,6 @@ Ext.define('SenChanvas.controller.phone.Main', {
             draggsCnt: {
                 initialize: 'onDraggsCntInit'
             },
-            dropCnt: {
-                initialize: 'onDropCntInit'
-            },
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             }
@@ -31,37 +28,41 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     init: function() {
-       var images = Ext.getStore('Images').load();
+       var images = Ext.getStore('Images');
+        images.load();
 
         images.on('load',this.onDraggsCntInit.bind(this));
 
     },
 
     onDraggsCntInit: function(cnt) {
-        var me = this,
-            drag = me.getDraggsCnt();
-        console.log('dragggg', drag);
+        alert(433);
+        var me = this;
+        console.log('dragggg', cnt);
 
-        Ext.each(cnt.getInnerItems(), function(item) {
-            if (Ext.isDefined(item.draggableBehavior)) {
-                var draggable = item.draggableBehavior.getDraggable();
-                console.log('draggable', draggable);
-                draggable.group = 'base';// Default group for droppable
-                draggable.revert = true;
+        cnt.on('painted',function(){
+            Ext.each(cnt.getInnerItems(), function(item) {
+                console.log('itemmmm', item);
+                if (Ext.isDefined(item.draggableBehavior)) {
+                    alert(242);
+                    var draggable = item.draggableBehavior.getDraggable();
+                    console.log('draggable', draggable);
+                    draggable.group = 'base';// Default group for droppable
+                    draggable.revert = true;
 
-                draggable.setConstraint({
-                    min: { x: -Infinity, y: -Infinity },
-                    max: { x: Infinity, y: Infinity }
-                });
+                    draggable.setConstraint({
+                        min: { x: -Infinity, y: -Infinity },
+                        max: { x: Infinity, y: Infinity }
+                    });
 
-                draggable.on({
-                    scope: me,
-                    dragstart: me.onDragStart,
-                    dragend: me.onDragEnd
-                });
-            }
+                    draggable.on({
+                        scope: me,
+                        dragstart: me.onDragStart,
+                        dragend: me.onDragEnd
+                    });
+                }
+            });
         });
-
         cnt.on('painted', me.onDropCntInit.bind(me));
     },
 
@@ -75,12 +76,11 @@ Ext.define('SenChanvas.controller.phone.Main', {
         console.log('End of dragging', arguments);
     },
 
-    onDropCntInit: function() {
-        var me = this,
-            dropCnt = me.getDropCnt();
+    onDropCntInit: function(cnt) {
+        var me = this;
 
         var drop = Ext.create('Ext.ux.util.Droppable', {
-            element: dropCnt.element
+            element: 'dropable'
         });
 
         drop.on({
