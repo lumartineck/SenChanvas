@@ -226,8 +226,12 @@ Ext.define('Ext.ux.util.Droppable', {
                             var draggs = elems[y].subscribers['dragstart'].id;
                             for (var x in draggs) {
                                 if (x !== '$length') {
-                                    var draggable = Ext.getCmp(x).getDraggableBehavior().draggable;
+                                    var cmp = Ext.getCmp(x);
+                                    if (cmp){
+                                    var draggable = cmp.getDraggableBehavior().draggable;
+                                        alert(2424234244242244242);
                                     this.draggables.push(draggable);
+                                    }
                                 }
                             }
                         }

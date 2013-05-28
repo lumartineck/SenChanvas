@@ -14,7 +14,7 @@ Ext.define('SenChanvas.view.ImagesDataview', {
             message: 'Cargando'
         },
         emptyText: 'No hay imagenes ...',
-        scrollable: 'horizontal',
+        //scrollable: 'horizontal',
         inline: {
             wrap: false
         },
