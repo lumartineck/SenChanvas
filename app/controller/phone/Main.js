@@ -23,13 +23,28 @@ Ext.define('SenChanvas.controller.phone.Main', {
             },
             draggsCnt: {
                 initialize: 'onDraggsCntInit'
+            },
+            '#principalPanel button[action=rotateR]': {
+                tap:'onButtonRotateRTap'
+            },
+            '#principalPanel button[action=rotateL]': {
+                tap:'onButtonRotateLTap'
+            },
+            '#principalPanel button[action=toFront]': {
+                tap:'onButtonToFrontTap'
+            },
+            '#principalPanel button[action=toBack]': {
+                tap:'onButtonToBackTap'
+            },
+            '#principalPanel button[action=delete]': {
+                tap:'onButtonDeleteTap'
             }
         }
     },
 
     init: function() {
         var images = Ext.getStore('Images').load();
-        images.on('load',this.onDraggsCntInit)
+        //images.on('load',this.onDraggsCntInit)
     },
 
     onDraggsCntInit: function(cnt) {
@@ -185,5 +200,22 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
         image.setLeft(me.getTransformDetails()[image.id].x);
         image.setTop(me.getTransformDetails()[image.id].y);
+    },
+
+
+    onButtonRotateRTap:function(){
+        console.log('rotateR');
+    },
+    onButtonRotateLTap:function(){
+        console.log('rotateL');
+    },
+    onButtonToFrontTap:function(){
+        console.log('frotn');
+    },
+    onButtonToBackTap:function(){
+        console.log('back');
+    },
+    onButtonDeleteTap:function(){
+        console.log('delete');
     }
 });
