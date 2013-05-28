@@ -24,8 +24,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 initialize: 'onDraggsCntInit'
             },
             /*dropCnt: {
-                initialize: 'onDropCntInit'
-            },*/
+             initialize: 'onDropCntInit'
+             },*/
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             },
@@ -114,7 +114,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
         var drop = Ext.create('Ext.ux.util.Droppable', {
             element: el.element
         });
-console.log('drop..', drop);
+        console.log('drop..', drop);
         drop.on({
             scope: me,
             drop: me.onDrop
@@ -139,31 +139,32 @@ console.log('drop..', drop);
             dropCnt.setHtml('');
             droppable.cleared = true;
         }
+        console.log('dragggg...',dragg._src);
         var x = dragg.getInnerHtmlElement().getX(),
             y = dragg.getInnerHtmlElement().getY(),
-            src = dragg.getSrcImage(),
+            src = dragg._src,
             newImage = dropCnt.add({
-            xtype: 'component',
-            top: y,//Falta poner dinamico el x y y
-            left: x,
-            draggable: true,
-            html: '<img src="'+src+'" width="150" height="150">',
-            width: 150,
-            height: 150
-            //style: "background-image: url('./resources/images/001.jpg');"
-        });
+                xtype: 'component',
+                top: y,//Falta poner dinamico el x y y
+                left: x,
+                draggable: true,
+                html: '<img src="'+src+'" width="150" height="150">',
+                width: 150,
+                height: 150
+                //style: "background-image: url('./resources/images/001.jpg');"
+            });
         me.addListeners(newImage, x, y);
         dragg.destroy();
     },
 
     onShowPrincipal: function (c) {
         /*console.log(c);
-        var me = this,
-            redSquare = c.down('#redSquare'),
-            blueSquare = c.down('#blueSquare');
+         var me = this,
+         redSquare = c.down('#redSquare'),
+         blueSquare = c.down('#blueSquare');
 
-        me.addListeners(redSquare, 10, 10);
-        me.addListeners(blueSquare, 200, 10);*/
+         me.addListeners(redSquare, 10, 10);
+         me.addListeners(blueSquare, 200, 10);*/
     },
 
     addListeners:function(image, x, y){

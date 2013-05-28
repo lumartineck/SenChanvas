@@ -11,6 +11,7 @@ Ext.application({
 
     requires: [
         'Ext.MessageBox',
+        'Ext.Img',
         'Ext.util.Draggable',
         'Ext.ux.util.Draggable',
         'Ext.ux.util.Droppable'
