@@ -93,11 +93,43 @@ Ext.define('SenChanvas.view.phone.Main', {
                         items: [{
                             xtype: 'component',
                             draggable: true,
-                            html: '<img src="./resources/images/001.jpg" width="50" height="50">'
+                            html: '<img src="./resources/images/001.jpg" width="50" height="50">',
+                            src: './resources/images/001.jpg'
                         },{
                             xtype: 'component',
                             draggable: true,
-                            html: '<img src="./resources/images/002.jpg" width="50" height="50">'
+                            html: '<img src="./resources/images/002.jpg" width="50" height="50">',
+                            src: './resources/images/002.jpg'
+                        },{
+                            xtype: 'component',
+                            draggable: true,
+                            html: '<img src="./resources/images/003.jpg" width="50" height="50">',
+                            src: './resources/images/003.jpg'
+                        },{
+                            xtype: 'component',
+                            draggable: true,
+                            html: '<img src="./resources/images/004.jpg" width="50" height="50">',
+                            src: './resources/images/004.jpg'
+                        },{
+                            xtype: 'component',
+                            draggable: true,
+                            html: '<img src="./resources/images/005.jpg" width="50" height="50">',
+                            src: './resources/images/005.jpg'
+                        },{
+                            xtype: 'component',
+                            draggable: true,
+                            html: '<img src="./resources/images/001.jpg" width="50" height="50">',
+                            src: './resources/images/001.jpg'
+                        },{
+                            xtype: 'component',
+                            draggable: true,
+                            html: '<img src="./resources/images/002.jpg" width="50" height="50">',
+                            src: './resources/images/002.jpg'
+                        },{
+                            xtype: 'component',
+                            draggable: true,
+                            html: '<img src="./resources/images/003.jpg" width="50" height="50">',
+                            src: './resources/images/003.jpg'
                         }]
                     }
                 ]

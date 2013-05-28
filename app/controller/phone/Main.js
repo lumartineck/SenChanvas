@@ -54,6 +54,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
     onDraggsCntInit: function(cnt) {
         var me = this,
             drop = me.getDropCnt();
+
+        //Ext.getStore('Images').on('load',me.createContImages.bind(cnt));
+
         console.log('Init draggs');
         cnt.on('painted',function(){
             Ext.each(cnt.getInnerItems(), function(item) {
@@ -78,6 +81,19 @@ Ext.define('SenChanvas.controller.phone.Main', {
         });
 
         me.onDropCntInit();
+    },
+
+    createContImages: function (cnt) {
+          Ext.getStore('Images').each(function (item, index, lenght){
+            var src = item.get('src');
+               cnt.add({
+                   xtype: 'component',
+                   draggable: true,
+                   html: '<img src="'+src+'" width="50" height="50">'
+               });
+          });
+
+        console.log('contendorrrrr',cnt);
     },
 
     onDragStart: function() {
@@ -121,16 +137,20 @@ console.log('drop..', drop);
             dropCnt.setHtml('');
             droppable.cleared = true;
         }
-
-        var newImage = dropCnt.add({
+        var x = dragg.getInnerHtmlElement().getX(),
+            y = dragg.getInnerHtmlElement().getY(),
+            src = dragg.src,
+            newImage = dropCnt.add({
             xtype: 'component',
-            top: 10,//Falta poner dinamico el x y y
-            left: 10,
-            width: 200,
-            height: 200,
-            style: "background-image: url('./resources/images/001.jpg');"
+            top: y,//Falta poner dinamico el x y y
+            left: x,
+            draggable: true,
+            html: '<img src="'+src+'" width="50" height="50">'
+            //width: 50,
+            //height: 50,
+            //style: "background-image: url('./resources/images/001.jpg');"
         });
-        me.addListeners(newImage, 10, 10);
+        me.addListeners(newImage, x, y);
         dragg.destroy();
     },
 
