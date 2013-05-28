@@ -8,6 +8,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
     config: {
         transformDetails: [],
+        selected:undefined,
         refs: {
             panelPrincipal: '#principalPanel',
             imagesDataview:'imagesdataview',
@@ -159,6 +160,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             pinch: {
                 element: 'element',
                 fn: function (e) {
+                    me.setSelectedImage(image);
                     // Get the scale property from the event
                     me.getTransformDetails()[image.id].scale = e.scale;
                     me.updateTransform(image);
@@ -168,6 +170,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             rotatestart: {
                 element: 'element',
                 fn: function (e) {
+                    me.setSelectedImage(image);
                     me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
                 },
                 scope:me
@@ -175,6 +178,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             rotate: {
                 element: 'element',
                 fn: function (e) {
+                    me.setSelectedImage(image);
                     me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + e.rotation;
                     me.updateTransform(image);
                 },
@@ -183,6 +187,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             drag: {
                 element: 'element',
                 fn: function (e) {
+                    me.setSelectedImage(image);
                     me.getTransformDetails()[image.id].x += e.previousDeltaX;
                     me.getTransformDetails()[image.id].y += e.previousDeltaY;
                     me.updateTransform(image);
@@ -192,13 +197,29 @@ Ext.define('SenChanvas.controller.phone.Main', {
             tap: {
                 element: 'element',
                 fn: function (e, node) {
-                    image.setStyle({
-                        border: '5px solid black'
-                    });
+                    me.setSelectedImage(image);
                 },
                 scope:me
             }
         });
+    },
+
+    setSelectedImage:function(image){
+        var me =this,
+            dropCnt = me.getDropCnt();
+        console.log('setSelected', dropCnt.getItems().items);
+        Ext.each(dropCnt.getItems().items, function(item){
+            if(item.id == image.id) {
+                item.setStyle({
+                    border: '5px solid black'
+                });
+            } else {
+                item.setStyle({
+                    border: '0px'
+                });
+            }
+        });
+        me.setSelected(image);
     },
 
     updateTransform:function(image){
@@ -249,5 +270,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
     onButtonDeleteTap:function(){
         console.log('delete');
+        if(this.getSelected()){
+            this.getSelected().destroy();
+        }
     }
 });
