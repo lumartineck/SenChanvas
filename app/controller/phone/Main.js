@@ -9,6 +9,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     config: {
         transformDetails: [],
         selected:undefined,
+        rotationAngle:10,
         refs: {
             panelPrincipal: '#principalPanel',
             imagesDataview:'imagesdataview',
@@ -108,7 +109,7 @@ console.log('drop..', drop);
     },
 
     onDrop: function(droppable, draggable) {
-        alert('has ganadooo..')
+        console.log('has ganadooo..');
         var me = this;
         console.log('Dropped', arguments);
 
@@ -121,17 +122,16 @@ console.log('drop..', drop);
             droppable.cleared = true;
         }
 
-        dropCnt.insert(0, Ext.create('Ext.Container', {
-            html: me.getHiString(),
-            padding: 20,
-            margin: 5,
-            style: 'border: black solid; border-radius: 7px; background-color: white; color: black;',
-            layout: {
-                type: 'vbox',
-                align: 'center'
-            }
-        }));
-
+        var newImage = dropCnt.add({
+            xtype: 'component',
+            html: 'Pinch me',
+            top: 10,//Falta poner dinamico el x y y
+            left: 10,
+            width: 200,
+            height: 200,
+            style: 'background-image: green'
+        });
+        me.addListeners(newImage, 10, 10);
         dragg.destroy();
     },
 
@@ -258,15 +258,35 @@ console.log('drop..', drop);
 
     onButtonRotateRTap:function(){
         console.log('rotateR');
+        var me = this;
+        me.rotate(me.getRotationAngle());
+
     },
     onButtonRotateLTap:function(){
         console.log('rotateL');
+        var me = this;
+        me.rotate(-me.getRotationAngle());
     },
+
+    rotate:function(angle){
+        var me = this,
+            image = me.getSelected();
+        me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
+        me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + angle;
+        me.updateTransform(image);
+    },
+
     onButtonToFrontTap:function(){
         console.log('frotn');
+        var me = this,
+            image = me.getSelected();
+        image.setZIndex(1000);
     },
     onButtonToBackTap:function(){
         console.log('back');
+        var me = this,
+            image = me.getSelected();
+        image.setZIndex(0);
     },
     onButtonDeleteTap:function(){
         console.log('delete');
