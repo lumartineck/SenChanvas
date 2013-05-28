@@ -11,35 +11,41 @@ Ext.define('SenChanvas.controller.phone.Main', {
         refs: {
             panelPrincipal: '#principalPanel',
             imagesDataview:'imagesdataview',
-            draggsCnt: '#draggsCnt'
+            draggsCnt: '#draggsCnt',
+            dropCnt: '#dropable'
         },
         control: {
             '#principalPanel': {
                 show: 'onShowPrincipal'
             },
-            imagesDataview:{
-                itemtap:'onImageItemTap',
-                itemtouchstart:'onItemTouchStart'
-            },
             draggsCnt: {
                 initialize: 'onDraggsCntInit'
+            },
+            dropCnt: {
+                initialize: 'onDropCntInit'
+            },
+            imagesDataview:{
+                itemtouchstart:'onItemTouchStart'
             }
         }
     },
 
     init: function() {
-        var images = Ext.getStore('Images').load();
-        images.on('load',this.onDraggsCntInit)
+       var images = Ext.getStore('Images').load();
+
+        images.on('load',this.onDraggsCntInit.bind(this));
+
     },
 
     onDraggsCntInit: function(cnt) {
-        var me = this;
-        console.log('Init draggs', cnt);
+        var me = this,
+            drag = me.getDraggsCnt();
+        console.log('dragggg', drag);
 
         Ext.each(cnt.getInnerItems(), function(item) {
             if (Ext.isDefined(item.draggableBehavior)) {
                 var draggable = item.draggableBehavior.getDraggable();
-
+                console.log('draggable', draggable);
                 draggable.group = 'base';// Default group for droppable
                 draggable.revert = true;
 
@@ -55,6 +61,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 });
             }
         });
+
+        cnt.on('painted', me.onDropCntInit.bind(me));
     },
 
     onDragStart: function() {
@@ -67,11 +75,12 @@ Ext.define('SenChanvas.controller.phone.Main', {
         console.log('End of dragging', arguments);
     },
 
-    onDropCntInit: function(cnt) {
-        var me = this;
+    onDropCntInit: function() {
+        var me = this,
+            dropCnt = me.getDropCnt();
 
         var drop = Ext.create('Ext.ux.util.Droppable', {
-            element: cnt.element
+            element: dropCnt.element
         });
 
         drop.on({
@@ -185,5 +194,28 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
         image.setLeft(me.getTransformDetails()[image.id].x);
         image.setTop(me.getTransformDetails()[image.id].y);
+    },
+
+    onItemTouchStart:function ( dataview, index, target, record, e, eOpts ) {
+
+        // alert('touchstart');
+        Ext.create('Ext.util.Draggable', {
+            element: "image-"+record.get('id'),
+            threshold: 0,
+            //direction: 'vertical',
+            animationDuration: 100,
+            listeners:{
+                drag:function  () {
+                    console.log('drag');
+                },
+                dragend:function  () {
+                    console.log('dragend');
+                },
+                dragstart:function  () {
+                    console.log('dragstart');
+                }
+            }
+        });
+        // Ext.get("image-"+record.get('id')).hide();
     }
 });
