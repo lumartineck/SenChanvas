@@ -49,13 +49,27 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
     init: function() {
         Ext.getStore('Images').load();
+
+        //Ext.getStore('Images').on('load',this.createContImages.bind(this));
+    },
+
+    createContImages: function () {
+        Ext.getStore('Images').each(function (item, index, lenght){
+            var src = item.get('src'),
+                cnt = Ext.getCmp('draggsCnt');
+            console.log('connnn',cnt)
+            cnt.add({
+                xtype: 'component',
+                draggable: true,
+                html: '<img src="'+src+'" width="50" height="50">',
+                src: src
+            });
+        });
     },
 
     onDraggsCntInit: function(cnt) {
         var me = this,
             drop = me.getDropCnt();
-
-        //Ext.getStore('Images').on('load',me.createContImages.bind(cnt));
 
         console.log('Init draggs');
         cnt.on('painted',function(){
@@ -81,19 +95,6 @@ Ext.define('SenChanvas.controller.phone.Main', {
         });
 
         me.onDropCntInit();
-    },
-
-    createContImages: function (cnt) {
-          Ext.getStore('Images').each(function (item, index, lenght){
-            var src = item.get('src');
-               cnt.add({
-                   xtype: 'component',
-                   draggable: true,
-                   html: '<img src="'+src+'" width="50" height="50">'
-               });
-          });
-
-        console.log('contendorrrrr',cnt);
     },
 
     onDragStart: function() {
