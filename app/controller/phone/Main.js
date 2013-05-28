@@ -27,7 +27,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
         console.log(c.down('#redSquare'));
         var me = this,
             redSquare = c.down('#redSquare');
-console.log('afuera', this,me.getTransformDetails());
+            console.log('afuera', this,me.getTransformDetails());
         redSquare.on({
             pinch: {
                 element: 'element',
