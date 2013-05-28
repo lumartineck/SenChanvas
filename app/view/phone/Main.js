@@ -32,6 +32,7 @@ Ext.define('SenChanvas.view.phone.Main', {
                 layout: 'vbox',
                 items: [
                     {
+<<<<<<< HEAD
                         xtype:'container',
                         id: 'dropable',
                         flex: 4
@@ -39,6 +40,26 @@ Ext.define('SenChanvas.view.phone.Main', {
                         xtype:'imagesdataview',
                         id: 'draggsCnt',
                         flex:1
+=======
+                        xtype:'component',
+                        html: 'Pinch me',
+                        itemId:'redSquare',
+                        top: 10,
+                        left: 10,
+                        width: 300,
+                        height: 300,
+                        style: 'background: red'
+                    },
+                    {
+                        xtype:'component',
+                        html: 'Pinch me',
+                        itemId:'blueSquare',
+                        top: 10,
+                        left: 200,
+                        width: 300,
+                        height: 300,
+                        style: 'background: blue'
+>>>>>>> origin/master
                     }
                 ]
             }

@@ -7,13 +7,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     extend: 'SenChanvas.controller.Main',
 
     config: {
-        transformDetails: {
-            scale: 1,
-            angle: 0,
-            x: 10,
-            y: 10
-        },
-        lastAngle : null,
+        transformDetails: [],
         refs: {
             panelPrincipal: '#principalPanel',
             imagesDataview:'imagesdataview',
@@ -118,60 +112,78 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     onShowPrincipal: function (c) {
-        console.log(c.down('#redSquare'));
+        console.log(c);
         var me = this,
-            redSquare = c.down('#redSquare');
-            //console.log('afuera', this,me.getTransformDetails());
-        redSquare.on({
+            redSquare = c.down('#redSquare'),
+            blueSquare = c.down('#blueSquare');
+
+        me.addListeners(redSquare, 10, 10);
+        me.addListeners(blueSquare, 200, 10);
+    },
+
+    addListeners:function(image, x, y){
+        var me = this;
+        me.getTransformDetails()[image.id] = {
+            scale: 1,
+            angle: 0,
+            x: x,
+            y: y,
+            lastAngle : null
+        };
+        console.log(me.getTransformDetails());
+        image.on({
             pinch: {
                 element: 'element',
                 fn: function (e) {
                     // Get the scale property from the event
-                    me.getTransformDetails().scale = e.scale;
-                    me.updateTransform(redSquare);
+                    me.getTransformDetails()[image.id].scale = e.scale;
+                    me.updateTransform(image);
                 },
                 scope:me
             },
             rotatestart: {
                 element: 'element',
                 fn: function (e) {
-                    me.setLastAngle(me.getTransformDetails().angle);
+                    me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
                 },
                 scope:me
             },
             rotate: {
                 element: 'element',
                 fn: function (e) {
-                    me.getTransformDetails().angle = me.getLastAngle() + e.rotation;
-                    me.updateTransform(redSquare);
+                    me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + e.rotation;
+                    me.updateTransform(image);
                 },
                 scope:me
             },
             drag: {
                 element: 'element',
                 fn: function (e) {
-                    console.log(me.getTransformDetails());
-                    me.getTransformDetails().x += e.previousDeltaX;
-                    me.getTransformDetails().y += e.previousDeltaY;
-                    me.updateTransform(redSquare);
+                    me.getTransformDetails()[image.id].x += e.previousDeltaX;
+                    me.getTransformDetails()[image.id].y += e.previousDeltaY;
+                    me.updateTransform(image);
                 },
                 scope:me
             },
             tap: {
                 element: 'element',
-                fn: function (e) {
-                    console.log('tap',arguments);
+                fn: function (e, node) {
+                    image.setStyle({
+                        border: '5px solid black'
+                    });
                 },
                 scope:me
             }
         });
     },
 
-    updateTransform:function(component){
+    updateTransform:function(image){
         var me = this;
-        component.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails().scale + ') scaleY(' + me.getTransformDetails().scale + ') rotate(' + me.getTransformDetails().angle + 'deg)');
+        image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
+            + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
+            + me.getTransformDetails()[image.id].angle + 'deg)');
 
-        component.setLeft(me.getTransformDetails().x);
-        component.setTop(me.getTransformDetails().y);
+        image.setLeft(me.getTransformDetails()[image.id].x);
+        image.setTop(me.getTransformDetails()[image.id].y);
     }
 });
