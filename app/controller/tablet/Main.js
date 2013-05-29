@@ -10,6 +10,8 @@ Ext.define('SenChanvas.controller.tablet.Main', {
         transformDetails: [],
         selected:undefined,
         rotationAngle:10,
+        minZIndex:undefined,
+        maxZIndex:undefined,
         refs: {
             panelPrincipal: '#principalPanel',
             imagesDataview:'imagesdataview',
@@ -24,8 +26,8 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                 initialize: 'onDraggsCntInit'
             },
             /*dropCnt: {
-                initialize: 'onDropCntInit'
-            },*/
+             initialize: 'onDropCntInit'
+             },*/
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             },
@@ -43,19 +45,37 @@ Ext.define('SenChanvas.controller.tablet.Main', {
             },
             '#principalPanel button[action=delete]': {
                 tap:'onButtonDeleteTap'
+            },
+            'button[action=clearDroppable]':{
+                tap:'onClearButtonTap'
             }
         }
     },
 
     init: function() {
         Ext.getStore('Images').load();
+
+        //Ext.getStore('Images').on('load',this.createContImages.bind(this));
+    },
+
+    createContImages: function () {
+        Ext.getStore('Images').each(function (item, index, lenght){
+            var src = item.get('src'),
+                cnt = Ext.getCmp('draggsCnt');
+            console.log('connnn',cnt)
+            cnt.add({
+                xtype: 'image',
+                draggable: true,
+                src: src,
+                height: 100,
+                width: 100
+            });
+        });
     },
 
     onDraggsCntInit: function(cnt) {
         var me = this,
             drop = me.getDropCnt();
-
-        //Ext.getStore('Images').on('load',me.createContImages.bind(cnt));
 
         console.log('Init draggs');
         cnt.on('painted',function(){
@@ -81,19 +101,6 @@ Ext.define('SenChanvas.controller.tablet.Main', {
         });
 
         me.onDropCntInit();
-    },
-
-    createContImages: function (cnt) {
-          Ext.getStore('Images').each(function (item, index, lenght){
-            var src = item.get('src');
-               cnt.add({
-                   xtype: 'component',
-                   draggable: true,
-                   html: '<img src="'+src+'" width="50" height="50">'
-               });
-          });
-
-        console.log('contendorrrrr',cnt);
     },
 
     onDragStart: function() {
@@ -129,39 +136,38 @@ console.log('drop..', drop);
         var me = this;
         console.log('Dropped', arguments);
 
-        var draggsCnt = me.getDraggsCnt();
         var dropCnt = me.getDropCnt();
         var dragg = Ext.getCmp(draggable.getElement().getId());
+        console.log('AQUI', dragg, draggable);
 
         if (!droppable.cleared) {
             dropCnt.setHtml('');
             droppable.cleared = true;
         }
+        console.log('dragggerrr...',dragg);
         var x = dragg.getInnerHtmlElement().getX(),
             y = dragg.getInnerHtmlElement().getY(),
-            src = dragg.getSrcImage(),
+            src = dragg._src,
             newImage = dropCnt.add({
-            xtype: 'component',
-            top: y,//Falta poner dinamico el x y y
-            left: x,
-            draggable: true,
-            html: '<img src="'+src+'" width="150" height="150">',
-            width: 150,
-            height: 150
-            //style: "background-image: url('./resources/images/001.jpg');"
-        });
-        me.addListeners(newImage, x, y);
+                xtype: 'component',
+                top: 10,
+                left: 10,
+                width: 100,
+                height: 100,
+                style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
+            });
+        me.addListeners(newImage, 10, 10);
         dragg.destroy();
     },
 
     onShowPrincipal: function (c) {
         /*console.log(c);
-        var me = this,
-            redSquare = c.down('#redSquare'),
-            blueSquare = c.down('#blueSquare');
+         var me = this,
+         redSquare = c.down('#redSquare'),
+         blueSquare = c.down('#blueSquare');
 
-        me.addListeners(redSquare, 10, 10);
-        me.addListeners(blueSquare, 200, 10);*/
+         me.addListeners(redSquare, 10, 10);
+         me.addListeners(blueSquare, 200, 10);*/
     },
 
     addListeners:function(image, x, y){
@@ -173,7 +179,7 @@ console.log('drop..', drop);
             y: y,
             lastAngle : null
         };
-        console.log(me.getTransformDetails());
+        console.log('transformDetails', me.getTransformDetails());
         image.on({
             pinch: {
                 element: 'element',
@@ -205,6 +211,7 @@ console.log('drop..', drop);
             drag: {
                 element: 'element',
                 fn: function (e) {
+                    console.log('e', e);
                     me.setSelectedImage(image);
                     me.getTransformDetails()[image.id].x += e.previousDeltaX;
                     me.getTransformDetails()[image.id].y += e.previousDeltaY;
@@ -233,7 +240,7 @@ console.log('drop..', drop);
                 });
             } else {
                 item.setStyle({
-                    border: '0px'
+                    border: '5px'
                 });
             }
         });
@@ -242,6 +249,7 @@ console.log('drop..', drop);
 
     updateTransform:function(image){
         var me = this;
+        console.log('update', me.getTransformDetails()[image.id]);
         image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
             + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
@@ -290,27 +298,36 @@ console.log('drop..', drop);
     rotate:function(angle){
         var me = this,
             image = me.getSelected();
+        console.log('rotate', me.getTransformDetails());
         me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
         me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + angle;
         me.updateTransform(image);
     },
 
     onButtonToFrontTap:function(){
-        console.log('frotn');
         var me = this,
-            image = me.getSelected();
-        image.setZIndex(1000);
+            image = me.getSelected(),
+            zIndex = me.getMaxZIndex()?me.getMaxZIndex()+1:100;
+        image.setZIndex(zIndex);
+        me.setMaxZIndex(zIndex);
     },
     onButtonToBackTap:function(){
-        console.log('back');
         var me = this,
-            image = me.getSelected();
-        image.setZIndex(0);
+            image = me.getSelected(),
+            zIndex = (me.getMinZIndex() || me.getMinZIndex() == 0) ? me.getMinZIndex()-1 : 0;
+        image.setZIndex(zIndex);
+        me.setMinZIndex(zIndex);
     },
     onButtonDeleteTap:function(){
-        console.log('delete');
         if(this.getSelected()){
             this.getSelected().destroy();
         }
+    },
+    onClearButtonTap:function(){
+        var me = this,
+            droppable = me.getMain().down('#dropable');
+        droppable.removeAll(true,true);
+
+        me.createContImages();
     }
 });

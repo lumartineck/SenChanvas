@@ -13,7 +13,8 @@ Ext.define('SenChanvas.view.phone.Main', {
                     iconAlign: 'center',
                     text: 'Clear',
                     align: 'left',
-                    iconMask: true
+                    iconMask: true,
+                    action: 'clearDroppable'
                 },
                 {
                     xtype: 'button',
@@ -69,6 +70,11 @@ Ext.define('SenChanvas.view.phone.Main', {
                         id: 'draggsCnt',
                         layout: 'hbox',
                         flex: 1,
+                        style: {
+                            'border' : 'solid 1px #D7D9DE',
+                            'border-radius' : '9px'
+                        },
+                        margin: '3 5 3 5',
                         items: [{
                             xtype: 'image',
                             draggable: true,
