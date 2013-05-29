@@ -144,13 +144,12 @@ Ext.define('SenChanvas.controller.phone.Main', {
             y = dragg.getInnerHtmlElement().getY(),
             src = dragg._src,
             newImage = dropCnt.add({
-                xtype: 'image',
-                draggable: true,
-                src: src,
-                height: 100,
+                xtype: 'component',
+                top: 10,
+                left: 10,
                 width: 100,
-                top: 10,//Falta poner dinamico el x y y
-                left: 10
+                height: 100,
+                style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
             });
         me.addListeners(newImage, 10, 10);
         dragg.destroy();
@@ -175,7 +174,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             y: y,
             lastAngle : null
         };
-        console.log(me.getTransformDetails());
+        console.log('transformDetails', me.getTransformDetails());
         image.on({
             pinch: {
                 element: 'element',
@@ -207,6 +206,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             drag: {
                 element: 'element',
                 fn: function (e) {
+                    console.log('e', e);
                     me.setSelectedImage(image);
                     me.getTransformDetails()[image.id].x += e.previousDeltaX;
                     me.getTransformDetails()[image.id].y += e.previousDeltaY;
@@ -244,6 +244,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
     updateTransform:function(image){
         var me = this;
+        console.log('update', me.getTransformDetails()[image.id]);
         image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
             + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
@@ -292,6 +293,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     rotate:function(angle){
         var me = this,
             image = me.getSelected();
+        console.log('rotate', me.getTransformDetails());
         me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
         me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + angle;
         me.updateTransform(image);
