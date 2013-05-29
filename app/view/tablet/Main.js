@@ -7,6 +7,7 @@ Ext.define('SenChanvas.view.tablet.Main', {
     extend: 'SenChanvas.view.Main',
     config: {
         navigationBar: {
+            id: 'navigationBar',
             items: [
                 {
                     xtype: 'button',
@@ -34,6 +35,7 @@ Ext.define('SenChanvas.view.tablet.Main', {
                     {
                         xtype: 'container',
                         layout:'hbox',
+                        id: 'buttons',
                         style: {
                             'border' : 'solid 1px #D7D9DE',
                             'border-radius' : '9px'
@@ -62,28 +64,7 @@ Ext.define('SenChanvas.view.tablet.Main', {
                             'border' : 'solid 3px #3CA9D0',
                             'border-radius' : '5px'
                         },
-                        margin: '3 5 3 5'/*,
-                        items: [
-                            {
-                                xtype: 'component',
-                                html: 'Pinch me',
-                                itemId: 'redSquare',
-                                top: 10,
-                                left: 10,
-                                width: 300,
-                                height: 300,
-                                style: 'background: red'
-                            },
-                            {
-                                xtype: 'component',
-                                html: 'Pinch me',
-                                itemId: 'blueSquare',
-                                top: 10,
-                                left: 200,
-                                width: 300,
-                                height: 300,
-                                style: 'background: blue'}
-                        ]*/
+                        margin: '3 5 3 5'
                     },
                     {
                         xtype: 'container',
@@ -91,61 +72,56 @@ Ext.define('SenChanvas.view.tablet.Main', {
                         layout: 'hbox',
                         flex: 1,
                         items: [{
-                            xtype: 'component',
+                            xtype: 'image',
                             draggable: true,
-                            html: '<img src="./resources/images/001.jpg" width="50" height="50">',
-                            getSrcImage:function(){
-                                return './resources/images/001.jpg';
-                            }
+                            src:"./resources/images/001.jpg",
+                            height: 100,
+                            width: 100
                         },{
-                            xtype: 'component',
+                            xtype: 'image',
                             draggable: true,
-                            html: '<img src="./resources/images/002.jpg" width="50" height="50">',
-                            getSrcImage:function(){
-                                return './resources/images/002.jpg';
-                            }
+                            src:"./resources/images/002.jpg",
+                            height: 100,
+                            width: 100
                         },{
-                            xtype: 'component',
+                            xtype: 'image',
                             draggable: true,
-                            html: '<img src="./resources/images/003.jpg" width="50" height="50">',
-                            getSrcImage:function(){
+                            src:"./resources/images/003.jpg",
+                            height: 100,
+                            width: 100
+                        },{
+                            xtype: 'image',
+                            draggable: true,
+                            src:"./resources/images/004.jpg",
+                            height: 100,
+                            width: 100
+                        },{
+                            xtype: 'image',
+                            draggable: true,
+                            src:"./resources/images/005.jpg",
+                            height: 100,
+                            width: 100
+                        },{
+                            xtype: 'image',
+                            draggable: true,
+                            src:"./resources/images/001.jpg",
+                            height: 100,
+                            width: 100
+                        },{
+                            xtype: 'image',
+                            draggable: true,
+                            src: "./resources/images/002.jpg",
+                            height: 100,
+                            width: 100
+                        },{
+                            xtype: 'image',
+                            draggable: true,
+                            src:"./resources/images/003.jpg",
+                            height: 100,
+                            width: 100
+                            /*getSrcImage:function(){
                                 return './resources/images/003.jpg';
-                            }
-                        },{
-                            xtype: 'component',
-                            draggable: true,
-                            html: '<img src="./resources/images/004.jpg" width="50" height="50">',
-                            getSrcImage:function(){
-                                return './resources/images/004.jpg';
-                            }
-                        },{
-                            xtype: 'component',
-                            draggable: true,
-                            html: '<img src="./resources/images/005.jpg" width="50" height="50">',
-                            getSrcImage:function(){
-                                return './resources/images/005.jpg';
-                            }
-                        },{
-                            xtype: 'component',
-                            getSrcImage:function(){
-                                return './resources/images/001.jpg';
-                            },
-                            draggable: true,
-                            html: '<img src="./resources/images/001.jpg" width="50" height="50">'
-                        },{
-                            xtype: 'component',
-                            draggable: true,
-                            html: '<img src="./resources/images/002.jpg" width="50" height="50">',
-                            getSrcImage:function(){
-                                return './resources/images/002.jpg';
-                            }
-                        },{
-                            xtype: 'component',
-                            draggable: true,
-                            html: '<img src="./resources/images/003.jpg" width="50" height="50">',
-                            getSrcImage:function(){
-                                return './resources/images/003.jpg';
-                            }
+                            }*/
                         }]
                     }
                 ]

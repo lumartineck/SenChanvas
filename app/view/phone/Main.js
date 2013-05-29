@@ -7,6 +7,7 @@ Ext.define('SenChanvas.view.phone.Main', {
     extend: 'SenChanvas.view.Main',
     config: {
         navigationBar: {
+            id: 'navigationBar',
             items: [
                 {
                     xtype: 'button',
@@ -34,6 +35,7 @@ Ext.define('SenChanvas.view.phone.Main', {
                     {
                         xtype: 'container',
                         layout:'hbox',
+                        id: 'buttons',
                         style: {
                             'border' : 'solid 1px #D7D9DE',
                             'border-radius' : '9px'

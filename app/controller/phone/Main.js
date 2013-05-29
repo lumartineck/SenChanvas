@@ -14,7 +14,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
             panelPrincipal: '#principalPanel',
             imagesDataview:'imagesdataview',
             draggsCnt: '#draggsCnt',
-            dropCnt: '#dropable'
+            dropCnt: '#dropable',
+            buttonsAct: '#buttons',
+            navigationBar: '#navigationBar'
         },
         control: {
             '#principalPanel': {
@@ -126,11 +128,13 @@ Ext.define('SenChanvas.controller.phone.Main', {
         console.log('Droppable init', drop);
     },
 
-    onDrop: function(droppable, draggable) {
+    onDrop: function(droppable, draggable, e) {
         console.log('has ganadooo..');
-        var me = this;
+        var me = this,
+            elemnt = draggable.getElement(),
+            heightNavigationBar = me.getNavigationBar().element.dom.offsetHeight,
+            heightButtons = me.getButtonsAct().element.dom.offsetHeight;
         console.log('Dropped', arguments);
-
         var dropCnt = me.getDropCnt();
         var dragg = Ext.getCmp(draggable.getElement().getId());
         console.log('AQUI', dragg, draggable);
@@ -139,19 +143,19 @@ Ext.define('SenChanvas.controller.phone.Main', {
             dropCnt.setHtml('');
             droppable.cleared = true;
         }
-        console.log('dragggerrr...',dragg);
-        var x = dragg.getInnerHtmlElement().getX(),
-            y = dragg.getInnerHtmlElement().getY(),
+
+        var x = elemnt.getX(),
+            y = elemnt.getY() - (heightButtons+heightNavigationBar),
             src = dragg._src,
             newImage = dropCnt.add({
                 xtype: 'component',
-                top: 10,
-                left: 10,
+                top: y,
+                left: x,
                 width: 100,
                 height: 100,
                 style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
             });
-        me.addListeners(newImage, 10, 10);
+        me.addListeners(newImage, x, y);
         dragg.destroy();
     },
 
@@ -232,6 +236,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             if(item.id == image.id) {
                 item.setStyle({
                     border: '5px solid black'
+                    //borderImage: 'url("./resources/images/border4.png") 25% repeat repeat'
                 });
             } else {
                 item.setStyle({
