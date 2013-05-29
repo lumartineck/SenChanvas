@@ -10,6 +10,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
         transformDetails: [],
         selected:undefined,
         rotationAngle:10,
+        minZIndex:undefined,
+        maxZIndex:undefined,
         refs: {
             panelPrincipal: '#principalPanel',
             imagesDataview:'imagesdataview',
@@ -45,6 +47,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
             },
             '#principalPanel button[action=delete]': {
                 tap:'onButtonDeleteTap'
+            },
+            'button[action=clearDroppable]':{
+                tap:'onClearButtonTap'
             }
         }
     },
@@ -305,21 +310,29 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     onButtonToFrontTap:function(){
-        console.log('frotn');
         var me = this,
-            image = me.getSelected();
-        image.setZIndex(1000);
+            image = me.getSelected(),
+            zIndex = me.getMaxZIndex()?me.getMaxZIndex()+1:100;
+        image.setZIndex(zIndex);
+        me.setMaxZIndex(zIndex);
     },
     onButtonToBackTap:function(){
-        console.log('back');
         var me = this,
-            image = me.getSelected();
-        image.setZIndex(0);
+            image = me.getSelected(),
+            zIndex = (me.getMinZIndex() || me.getMinZIndex() == 0) ? me.getMinZIndex()-1 : 0;
+        image.setZIndex(zIndex);
+        me.setMinZIndex(zIndex);
     },
     onButtonDeleteTap:function(){
-        console.log('delete');
         if(this.getSelected()){
             this.getSelected().destroy();
         }
+    },
+    onClearButtonTap:function(){
+        var me = this,
+            droppable = me.getMain().down('#dropable');
+        droppable.removeAll(true,true);
+
+        me.createContImages();
     }
 });

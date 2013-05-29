@@ -10,6 +10,8 @@ Ext.define('SenChanvas.controller.tablet.Main', {
         transformDetails: [],
         selected:undefined,
         rotationAngle:10,
+        minZIndex:undefined,
+        maxZIndex:undefined,
         refs: {
             panelPrincipal: '#principalPanel',
             imagesDataview:'imagesdataview',
@@ -26,8 +28,8 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                 initialize: 'onDraggsCntInit'
             },
             /*dropCnt: {
-             initialize: 'onDropCntInit'
-             },*/
+                initialize: 'onDropCntInit'
+            },*/
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             },
@@ -45,6 +47,9 @@ Ext.define('SenChanvas.controller.tablet.Main', {
             },
             '#principalPanel button[action=delete]': {
                 tap:'onButtonDeleteTap'
+            },
+            'button[action=clearDroppable]':{
+                tap:'onClearButtonTap'
             }
         }
     },
@@ -161,12 +166,12 @@ console.log('drop..', drop);
 
     onShowPrincipal: function (c) {
         /*console.log(c);
-         var me = this,
-         redSquare = c.down('#redSquare'),
-         blueSquare = c.down('#blueSquare');
+        var me = this,
+            redSquare = c.down('#redSquare'),
+            blueSquare = c.down('#blueSquare');
 
-         me.addListeners(redSquare, 10, 10);
-         me.addListeners(blueSquare, 200, 10);*/
+        me.addListeners(redSquare, 10, 10);
+        me.addListeners(blueSquare, 200, 10);*/
     },
 
     addListeners:function(image, x, y){
@@ -178,7 +183,7 @@ console.log('drop..', drop);
             y: y,
             lastAngle : null
         };
-        console.log('transformDetails', me.getTransformDetails());
+        console.log(me.getTransformDetails());
         image.on({
             pinch: {
                 element: 'element',
@@ -210,7 +215,6 @@ console.log('drop..', drop);
             drag: {
                 element: 'element',
                 fn: function (e) {
-                    console.log('e', e);
                     me.setSelectedImage(image);
                     me.getTransformDetails()[image.id].x += e.previousDeltaX;
                     me.getTransformDetails()[image.id].y += e.previousDeltaY;
@@ -249,7 +253,6 @@ console.log('drop..', drop);
 
     updateTransform:function(image){
         var me = this;
-        console.log('update', me.getTransformDetails()[image.id]);
         image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
             + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
@@ -305,21 +308,29 @@ console.log('drop..', drop);
     },
 
     onButtonToFrontTap:function(){
-        console.log('frotn');
         var me = this,
-            image = me.getSelected();
-        image.setZIndex(1000);
+            image = me.getSelected(),
+            zIndex = me.getMaxZIndex()?me.getMaxZIndex()+1:100;
+        image.setZIndex(zIndex);
+        me.setMaxZIndex(zIndex);
     },
     onButtonToBackTap:function(){
-        console.log('back');
         var me = this,
-            image = me.getSelected();
-        image.setZIndex(0);
+            image = me.getSelected(),
+            zIndex = (me.getMinZIndex() || me.getMinZIndex() == 0) ? me.getMinZIndex()-1 : 0;
+        image.setZIndex(zIndex);
+        me.setMinZIndex(zIndex);
     },
     onButtonDeleteTap:function(){
-        console.log('delete');
         if(this.getSelected()){
             this.getSelected().destroy();
         }
+    },
+    onClearButtonTap:function(){
+        var me = this,
+            droppable = me.getMain().down('#dropable');
+        droppable.removeAll(true,true);
+
+        me.createContImages();
     }
 });
