@@ -50,6 +50,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
             },
             'button[action=clearDroppable]':{
                 tap:'onClearButtonTap'
+            },
+            'button[action=expand]':{
+                tap:'onExpandButtonTap'
             }
         }
     },
@@ -160,6 +163,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 height: 100,
                 style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
             });
+        me.setSelectedImage(newImage);
         me.addListeners(newImage, x, y);
         dragg.destroy();
     },
@@ -215,10 +219,31 @@ Ext.define('SenChanvas.controller.phone.Main', {
             drag: {
                 element: 'element',
                 fn: function (e) {
-                    console.log('e', e);
+                    console.log('imageeeen', image);
+                    var domElement = me.getDropCnt().element.dom,
+                        scale = me.getTransformDetails()[image.id].scale,
+                        scaledIncrement = (((image.getHeight() * scale) - image.getHeight()) / 2),
+                        limitTop = image.getTop() - scaledIncrement + me.getButtonsAct().element.dom.offsetHeight+ 10/*padding*/ + e.previousDeltaY,
+                        dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
+                        limitBottom = image.getTop() + image.getHeight() + scaledIncrement + 10 /*pading*/ + e.previousDeltaY,
+                        limitLeft = image.getLeft() - scaledIncrement + 6 /*pading*/ + e.previousDeltaX,
+                        dropRigth = domElement.offsetLeft + domElement.offsetWidth,
+                        limitRight = image.getLeft() + image.getWidth() + scaledIncrement + 10 /*pading*/ + e.previousDeltaX;
+
+                    console.log(domElement.offsetTop, limitTop, domElement.offsetLeft, limitLeft, dropRigth, limitRight, dropBottom, limitBottom);
+                    console.log(image.getTop(), ((image.getTop() * scale) - image.getTop()) / 2);
                     me.setSelectedImage(image);
-                    me.getTransformDetails()[image.id].x += e.previousDeltaX;
-                    me.getTransformDetails()[image.id].y += e.previousDeltaY;
+                    if(domElement.offsetTop < limitTop
+                        && dropBottom > limitBottom){
+                        console.log('entro limite top bottom');
+                        me.getTransformDetails()[image.id].y += e.previousDeltaY;
+                    }
+                    if(domElement.offsetLeft < limitLeft
+                        && dropRigth > limitRight){
+                        console.log('entro limite left rigth');
+                        me.getTransformDetails()[image.id].x += e.previousDeltaX;
+                    }
+                    //me.getTransformDetails()[image.id].scale = 1.5;
                     me.updateTransform(image);
                 },
                 scope:me
@@ -334,5 +359,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
         droppable.removeAll(true,true);
 
         me.createContImages();
+    },
+    onExpandButtonTap:function(){
+
     }
 });

@@ -28,8 +28,8 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                 initialize: 'onDraggsCntInit'
             },
             /*dropCnt: {
-                initialize: 'onDropCntInit'
-            },*/
+             initialize: 'onDropCntInit'
+             },*/
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             },
@@ -50,6 +50,9 @@ Ext.define('SenChanvas.controller.tablet.Main', {
             },
             'button[action=clearDroppable]':{
                 tap:'onClearButtonTap'
+            },
+            'button[action=expand]':{
+                tap:'onExpandButtonTap'
             }
         }
     },
@@ -122,7 +125,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
         var drop = Ext.create('Ext.ux.util.Droppable', {
             element: el.element
         });
-console.log('drop..', drop);
+        console.log('drop..', drop);
         drop.on({
             scope: me,
             drop: me.onDrop
@@ -160,18 +163,19 @@ console.log('drop..', drop);
                 height: 100,
                 style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
             });
+        me.setSelectedImage(newImage);
         me.addListeners(newImage, x, y);
         dragg.destroy();
     },
 
     onShowPrincipal: function (c) {
         /*console.log(c);
-        var me = this,
-            redSquare = c.down('#redSquare'),
-            blueSquare = c.down('#blueSquare');
+         var me = this,
+         redSquare = c.down('#redSquare'),
+         blueSquare = c.down('#blueSquare');
 
-        me.addListeners(redSquare, 10, 10);
-        me.addListeners(blueSquare, 200, 10);*/
+         me.addListeners(redSquare, 10, 10);
+         me.addListeners(blueSquare, 200, 10);*/
     },
 
     addListeners:function(image, x, y){
@@ -183,7 +187,7 @@ console.log('drop..', drop);
             y: y,
             lastAngle : null
         };
-        console.log(me.getTransformDetails());
+        console.log('transformDetails', me.getTransformDetails());
         image.on({
             pinch: {
                 element: 'element',
@@ -215,9 +219,31 @@ console.log('drop..', drop);
             drag: {
                 element: 'element',
                 fn: function (e) {
+                    console.log('imageeeen', image);
+                    var domElement = me.getDropCnt().element.dom,
+                        scale = me.getTransformDetails()[image.id].scale,
+                        scaledIncrement = (((image.getHeight() * scale) - image.getHeight()) / 2),
+                        limitTop = image.getTop() - scaledIncrement + me.getButtonsAct().element.dom.offsetHeight+ 10/*padding*/ + e.previousDeltaY,
+                        dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
+                        limitBottom = image.getTop() + image.getHeight() + scaledIncrement + 10 /*pading*/ + e.previousDeltaY,
+                        limitLeft = image.getLeft() - scaledIncrement + 6 /*pading*/ + e.previousDeltaX,
+                        dropRigth = domElement.offsetLeft + domElement.offsetWidth,
+                        limitRight = image.getLeft() + image.getWidth() + scaledIncrement + 10 /*pading*/ + e.previousDeltaX;
+
+                    console.log(domElement.offsetTop, limitTop, domElement.offsetLeft, limitLeft, dropRigth, limitRight, dropBottom, limitBottom);
+                    console.log(image.getTop(), ((image.getTop() * scale) - image.getTop()) / 2);
                     me.setSelectedImage(image);
-                    me.getTransformDetails()[image.id].x += e.previousDeltaX;
-                    me.getTransformDetails()[image.id].y += e.previousDeltaY;
+                    if(domElement.offsetTop < limitTop
+                        && dropBottom > limitBottom){
+                        console.log('entro limite top bottom');
+                        me.getTransformDetails()[image.id].y += e.previousDeltaY;
+                    }
+                    if(domElement.offsetLeft < limitLeft
+                        && dropRigth > limitRight){
+                        console.log('entro limite left rigth');
+                        me.getTransformDetails()[image.id].x += e.previousDeltaX;
+                    }
+                    //me.getTransformDetails()[image.id].scale = 1.5;
                     me.updateTransform(image);
                 },
                 scope:me
@@ -253,6 +279,7 @@ console.log('drop..', drop);
 
     updateTransform:function(image){
         var me = this;
+        console.log('update', me.getTransformDetails()[image.id]);
         image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
             + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
@@ -332,5 +359,8 @@ console.log('drop..', drop);
         droppable.removeAll(true,true);
 
         me.createContImages();
+    },
+    onExpandButtonTap:function(){
+
     }
 });
