@@ -154,6 +154,7 @@ console.log('drop..', drop);
             src = dragg._src,
             newImage = dropCnt.add({
                 xtype: 'component',
+                id: 'image' + this.id,
                 top: y,
                 left: x,
                 width: 100,
@@ -175,7 +176,9 @@ console.log('drop..', drop);
     },
 
     addListeners:function(image, x, y){
-        var me = this;
+        var me = this,
+            imageCmp = Ext.getCmp('image' + this.id);
+        console.log('componente image', imageCmp);
         me.getTransformDetails()[image.id] = {
             scale: 1,
             angle: 0,
@@ -183,7 +186,7 @@ console.log('drop..', drop);
             y: y,
             lastAngle : null
         };
-        console.log(me.getTransformDetails());
+        console.log('transformDetails', me.getTransformDetails());
         image.on({
             pinch: {
                 element: 'element',
@@ -215,10 +218,18 @@ console.log('drop..', drop);
             drag: {
                 element: 'element',
                 fn: function (e) {
-                    me.setSelectedImage(image);
-                    me.getTransformDetails()[image.id].x += e.previousDeltaX;
-                    me.getTransformDetails()[image.id].y += e.previousDeltaY;
-                    me.updateTransform(image);
+                    console.log('e', e);
+                    if( e.getTarget('div.circleBase')){
+                        //console.log('entraaaa',me.getTransformDetails()[imageCmp.id].scale=2);
+                        me.getTransformDetails()[imageCmp.id].scale = me.getTransformDetails()[imageCmp.id].scale + 1;
+                        me.updateTransform(imageCmp);
+                        me.updateTransformCorner(image, imageCmp);
+                    } else {
+                        me.setSelectedImage(image);
+                        me.getTransformDetails()[image.id].x += e.previousDeltaX;
+                        me.getTransformDetails()[image.id].y += e.previousDeltaY;
+                        me.updateTransform(image);
+                    }
                 },
                 scope:me
             },
@@ -238,14 +249,30 @@ console.log('drop..', drop);
         //console.log('setSelected', dropCnt.getItems().items);
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
-                item.setStyle({
-                    border: '5px solid black'
-                    //borderImage: 'url("./resources/images/border4.png") 25% repeat repeat'
+                var xLeft = image.element.dom.offsetLeft - 12,
+                    yTop = image.element.dom.offsetTop - 10;
+                var iconTopLeft = dropCnt.add({
+                    xtype: 'container',
+                    top: yTop,
+                    left: xLeft,
+                    width: 20,
+                    height: 20,
+                    cls: 'circleBase circle'
                 });
-            } else {
-                item.setStyle({
-                    border: '5px'
+                console.log(image);
+                iconTopLeft.setZIndex(image._zIndex + 1);
+                me.addListeners(iconTopLeft, xLeft, yTop);
+
+                var iconBottomRight = dropCnt.add({
+                    xtype: 'container',
+                    top: image.element.dom.offsetTop + (image.element.dom.clientHeight - 7),
+                    left: image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
+                    width: 20,
+                    height: 20,
+                    cls: 'circleBase circle'
                 });
+                console.log(image);
+                iconBottomRight.setZIndex(image._zIndex + 1);
             }
         });
         me.setSelected(image);
@@ -253,12 +280,27 @@ console.log('drop..', drop);
 
     updateTransform:function(image){
         var me = this;
+        console.log('update', me.getTransformDetails()[image.id]);
         image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
             + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
 
         image.setLeft(me.getTransformDetails()[image.id].x);
         image.setTop(me.getTransformDetails()[image.id].y);
+    },
+
+    updateTransformCorner: function(imageCorner, image){
+        console.log('updateTransform', image);
+        var me = this;
+        //console.log('update', me.getTransformDetails()[imageCorner.id]);
+        imageCorner.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[imageCorner.id].scale
+            + ') scaleY(' + me.getTransformDetails()[imageCorner.id].scale + ') rotate('
+            + me.getTransformDetails()[imageCorner.id].angle + 'deg)');
+
+        console.log('didirer',image);
+        imageCorner.setLeft(image.element.dom.offsetLeft - 60);
+        imageCorner.setTop(image.element.dom.offsetTop - 55);
+        imageCorner.setZIndex(image._zIndex + 1);
     },
 
     onItemTouchStart:function ( dataview, index, target, record, e, eOpts ) {

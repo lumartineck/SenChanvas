@@ -158,6 +158,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 left: x,
                 width: 100,
                 height: 100,
+                resizable: true,
                 style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
             });
         me.addListeners(newImage, x, y);
@@ -175,9 +176,12 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     addListeners:function(image, x, y){
-        var me = this;
+        var me = this,
+            imageCmp = Ext.getCmp('image' + this.id);
+        console.log('componente image', imageCmp);
         me.getTransformDetails()[image.id] = {
-            scale: 1,
+            scaleX: 1,
+            scaleY: 1,
             angle: 0,
             x: x,
             y: y,
@@ -190,7 +194,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 fn: function (e) {
                     me.setSelectedImage(image);
                     // Get the scale property from the event
-                    me.getTransformDetails()[image.id].scale = e.scale;
+                    me.getTransformDetails()[image.id].scaleX = e.scale;
+                    me.getTransformDetails()[image.id].scaleY = e.scale;
                     me.updateTransform(image);
                 },
                 scope:me
@@ -216,10 +221,10 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 element: 'element',
                 fn: function (e) {
                     console.log('e', e);
-                    me.setSelectedImage(image);
-                    me.getTransformDetails()[image.id].x += e.previousDeltaX;
-                    me.getTransformDetails()[image.id].y += e.previousDeltaY;
-                    me.updateTransform(image);
+                        me.setSelectedImage(image);
+                        me.getTransformDetails()[image.id].x += e.previousDeltaX;
+                        me.getTransformDetails()[image.id].y += e.previousDeltaY;
+                        me.updateTransform(image);
                 },
                 scope:me
             },
@@ -236,16 +241,102 @@ Ext.define('SenChanvas.controller.phone.Main', {
     setSelectedImage:function(image){
         var me =this,
             dropCnt = me.getDropCnt();
-        //console.log('setSelected', dropCnt.getItems().items);
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
-                item.setStyle({
-                    border: '5px solid black'
-                    //borderImage: 'url("./resources/images/border4.png") 25% repeat repeat'
+                var xL = me.getTransformDetails()[image.id].x - 12,
+                    yL = me.getTransformDetails()[image.id].y - 10;
+                var iconTopLeft = dropCnt.add({
+                    xtype: 'component',
+                    top: yL,
+                    left: xL,
+                    width: 20,
+                    height: 20,
+                    cls: 'circleBase circle'
                 });
-            } else {
-                item.setStyle({
-                    border: '5px'
+                //iconTopLeft.setZIndex(image._zIndex + 1);
+
+                me.getTransformDetails()[iconTopLeft.id] = {
+                    scaleX: 1,
+                    scaleY: 1,
+                    angle: 0,
+                    x: xL,
+                    y: yL,
+                    lastAngle : null
+                };
+
+                iconTopLeft.on({
+                    drag: {
+                        element: 'element',
+                        fn: function (e, node) {
+                            if( e.getTarget('div.circleBase')){
+                                var scaleX = e.startX / e.pageX,
+                                    scaleY = e.startY / e.pageY;
+                                me.getTransformDetails()[image.id].scaleX = scaleX;
+                                me.getTransformDetails()[image.id].scaleY = scaleY;
+                                me.updateTransform(image);
+
+                                var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
+                                    valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
+                                    valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
+                                    valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
+
+                                console.log('transsformer',valorX, valorY);
+                                me.getTransformDetails()[iconTopLeft.id].x = (me.getTransformDetails()[image.id].x - valorX) - 12;
+                                me.getTransformDetails()[iconTopLeft.id].y = (me.getTransformDetails()[image.id].y - valorY) - 10;
+                                me.updateTransform(iconTopLeft);
+                            }
+                        }
+                    }
+                });
+
+                var xR = image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
+                    yR = image.element.dom.offsetTop + (image.element.dom.clientHeight - 7);
+
+                /*var xR = me.getTransformDetails()[image.id].x + (image.element.dom.clientHeight - 9),
+                    yR = me.getTransformDetails()[image.id].y + (image.element.dom.clientHeight - 7);*/
+
+
+                var iconBottomRight = dropCnt.add({
+                    xtype: 'container',
+                    top: yR,
+                    left: xR,
+                    width: 20,
+                    height: 20,
+                    cls: 'circleBase circle'
+                });
+
+                me.getTransformDetails()[iconBottomRight.id] = {
+                    scaleX: 1,
+                    scaleY: 1,
+                    angle: 0,
+                    x: xR,
+                    y: yR,
+                    lastAngle : null
+                };
+
+                iconBottomRight.on({
+                    drag: {
+                        element: 'element',
+                        fn: function (e, node) {
+                            if( e.getTarget('div.circleBase')){
+                                var scaleX = e.pageX / e.startX,
+                                    scaleY = e.pageY / e.startY;
+                                me.getTransformDetails()[image.id].scaleX = scaleX;
+                                me.getTransformDetails()[image.id].scaleY = scaleY;
+                                me.updateTransform(image);
+
+                                var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
+                                    valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
+                                    valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
+                                    valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
+
+                                console.log('transsformer',valorX, valorY);
+                                me.getTransformDetails()[iconBottomRight.id].x = (me.getTransformDetails()[image.id].x + image.element.dom.clientHeight + valorX);
+                                me.getTransformDetails()[iconBottomRight.id].y = (me.getTransformDetails()[image.id].y + image.element.dom.clientHeight + valorY);
+                                me.updateTransform(iconBottomRight);
+                            }
+                        }
+                    }
                 });
             }
         });
@@ -255,8 +346,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
     updateTransform:function(image){
         var me = this;
         console.log('update', me.getTransformDetails()[image.id]);
-        image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
-            + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
+        image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scaleX
+            + ') scaleY(' + me.getTransformDetails()[image.id].scaleY + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
 
         image.setLeft(me.getTransformDetails()[image.id].x);
