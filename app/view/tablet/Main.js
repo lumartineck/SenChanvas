@@ -82,50 +82,50 @@ Ext.define('SenChanvas.view.tablet.Main', {
                             xtype: 'image',
                             draggable: true,
                             src:"./resources/images/001.jpg",
-                            height: 50,
-                            width: 50
+                            height: 100,
+                            width: 100
                         },{
                             xtype: 'image',
                             draggable: true,
                             src:"./resources/images/002.jpg",
-                            height: 50,
-                            width: 50
+                            height: 100,
+                            width: 100
                         },{
                             xtype: 'image',
                             draggable: true,
                             src:"./resources/images/003.jpg",
-                            height: 50,
-                            width: 50
+                            height: 100,
+                            width: 100
                         },{
                             xtype: 'image',
                             draggable: true,
                             src:"./resources/images/004.jpg",
-                            height: 50,
-                            width: 50
+                            height: 100,
+                            width: 100
                         },{
                             xtype: 'image',
                             draggable: true,
                             src:"./resources/images/005.jpg",
-                            height: 50,
-                            width: 50
+                            height: 100,
+                            width: 100
                         },{
                             xtype: 'image',
                             draggable: true,
                             src:"./resources/images/001.jpg",
-                            height: 50,
-                            width: 50
+                            height: 100,
+                            width: 100
                         },{
                             xtype: 'image',
                             draggable: true,
                             src: "./resources/images/002.jpg",
-                            height: 50,
-                            width: 50
+                            height: 100,
+                            width: 100
                         },{
                             xtype: 'image',
                             draggable: true,
                             src:"./resources/images/003.jpg",
-                            height: 50,
-                            width: 50
+                            height: 100,
+                            width: 100
                             /*getSrcImage:function(){
                                 return './resources/images/003.jpg';
                             }*/

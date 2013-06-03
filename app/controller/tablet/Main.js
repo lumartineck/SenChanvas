@@ -159,10 +159,17 @@ console.log('drop..', drop);
                 xtype: 'component',
                 top: y,
                 left: x,
-                width: 50,
-                height: 50,
-                style: "background-image: url('"+src+"'); background-size:50px 50px; background-repeat:no-repeat"
+                width: 100,
+                height: 100,
+                style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
             });
+            me.getTransformDetails()[newImage.id] = {
+                scaleX: 1,
+                scaleY: 1,
+                angle: 0,
+                x: x,
+                y: y
+            }
         me.setSelectedImage(newImage);
         me.addListeners(newImage, x, y);
         dragg.destroy();
@@ -180,8 +187,10 @@ console.log('drop..', drop);
 
     addListeners:function(image, x, y){
         var me = this;
+
         me.getTransformDetails()[image.id] = {
-            scale: 1,
+            scaleX: 1,
+            scaleY: 1,
             angle: 0,
             x: x,
             y: y,
@@ -194,7 +203,8 @@ console.log('drop..', drop);
                 fn: function (e) {
                     me.setSelectedImage(image);
                     // Get the scale property from the event
-                    me.getTransformDetails()[image.id].scale = e.scale;
+                    me.getTransformDetails()[image.id].scaleX = e.scale;
+                    me.getTransformDetails()[image.id].scaleY = e.scale;
                     me.updateTransform(image);
                 },
                 scope:me
@@ -219,32 +229,48 @@ console.log('drop..', drop);
             drag: {
                 element: 'element',
                 fn: function (e) {
-                    console.log('imageeeen', image);
                     var domElement = me.getDropCnt().element.dom,
-                        scale = me.getTransformDetails()[image.id].scale,
-                        scaledIncrement = (((image.getHeight() * scale) - image.getHeight()) / 2),
-                        limitTop = image.getTop() - scaledIncrement + me.getButtonsAct().element.dom.offsetHeight+ 10/*padding*/ + e.previousDeltaY,
-                        dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
-                        limitBottom = image.getTop() + image.getHeight() + scaledIncrement + 10 /*pading*/ + e.previousDeltaY,
-                        limitLeft = image.getLeft() - scaledIncrement + 6 /*pading*/ + e.previousDeltaX,
-                        dropRigth = domElement.offsetLeft + domElement.offsetWidth,
-                        limitRight = image.getLeft() + image.getWidth() + scaledIncrement + 10 /*pading*/ + e.previousDeltaX;
+                        scaleX = me.getTransformDetails()[image.id].scaleX,
+                        scaleY = me.getTransformDetails()[image.id].scaleY,
+                        scaledIncrementX = (((image.getHeight() * scaleX) - image.getHeight()) / 2),
+                        scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2),
 
+                        limitTop = image.getTop() - scaledIncrementY + me.getButtonsAct().element.dom.offsetHeight+ 10/*padding*/ + e.previousDeltaY,
+                        dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
+                        limitBottom = image.getTop() + image.getHeight() + scaledIncrementY + 10 /*pading*/ + e.previousDeltaY,
+
+                        limitLeft = image.getLeft() - scaledIncrementX + 6 /*pading*/ + e.previousDeltaX,
+                        dropRigth = domElement.offsetLeft + domElement.offsetWidth,
+                        limitRight = image.getLeft() + image.getWidth() + scaledIncrementX + 10 /*pading*/ + e.previousDeltaX,
+                        imageSom = me.getDropCnt().items.items[1];
                     console.log(domElement.offsetTop, limitTop, domElement.offsetLeft, limitLeft, dropRigth, limitRight, dropBottom, limitBottom);
-                    console.log(image.getTop(), ((image.getTop() * scale) - image.getTop()) / 2);
-                    me.setSelectedImage(image);
+                    //console.log(image.getTop(), ((image.getTop() * scale) - image.getTop()) / 2);
+                    //me.setSelectedImage(image);
+                    console.log(imageSom);
+                    me.getTransformDetails()[imageSom.id] = {
+                        scaleX: 1,
+                        scaleY: 1,
+                        angle: 0,
+                        x: imageSom.element.dom.offsetLeft,
+                        y: imageSom.element.dom.offsetTop,
+                        lastAngle : null
+                    };
+
                     if(domElement.offsetTop < limitTop
                         && dropBottom > limitBottom){
                         console.log('entro limite top bottom');
                         me.getTransformDetails()[image.id].y += e.previousDeltaY;
+                        me.getTransformDetails()[imageSom.id].y += e.previousDeltaY
                     }
                     if(domElement.offsetLeft < limitLeft
                         && dropRigth > limitRight){
                         console.log('entro limite left rigth');
                         me.getTransformDetails()[image.id].x += e.previousDeltaX;
+                        me.getTransformDetails()[imageSom.id].x += e.previousDeltaX;
                     }
                     //me.getTransformDetails()[image.id].scale = 1.5;
                     me.updateTransform(image);
+                    me.updateTransform(imageSom);
                 },
                 scope:me
             },
@@ -261,28 +287,20 @@ console.log('drop..', drop);
     setSelectedImage:function(image){
         var me =this,
             dropCnt = me.getDropCnt();
-        //console.log('setSelected', dropCnt.getItems().items);
+        //console.log('setSelected', me.getTransformDetails()[image.id], image);
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
-                item.setStyle({
-                    border: '5px solid black'
-                    //borderImage: 'url("./resources/images/border4.png") 25% repeat repeat'
-                });
-            } else {
-                item.setStyle({
-                    border: '5px'
-                });
-                /*var xL = me.getTransformDetails()[image.id].x - 12,
-                    yL = me.getTransformDetails()[image.id].y - 10;
+                var xL = me.getTransformDetails()[image.id].x -10,
+                    yL = me.getTransformDetails()[image.id].y -10;
                 var iconTopLeft = dropCnt.add({
                     xtype: 'component',
                     top: yL,
                     left: xL,
-                    width: 20,
-                    height: 20,
-                    cls: 'circleBase circle'
+                    width: 120,
+                    height: 120,
+                    style: "background-image: url('./resources/images/border4.png'); background-size:120px 120px; background-repeat:no-repeat"
                 });
-                //iconTopLeft.setZIndex(image._zIndex + 1);
+                iconTopLeft.setZIndex(image._zIndex - 1);
 
                 me.getTransformDetails()[iconTopLeft.id] = {
                     scaleX: 1,
@@ -297,28 +315,36 @@ console.log('drop..', drop);
                     drag: {
                         element: 'element',
                         fn: function (e, node) {
-                            if( e.getTarget('div.circleBase')){
-                                var scaleX = e.startX / e.pageX,
-                                    scaleY = e.startY / e.pageY;
+                            //if( e.getTarget('div.circleBase')){
+                                var scaleX =  e.pageX / e.startX,
+                                    scaleY =  e.startY / e.pageY;
+
+                            console.log('icon',iconTopLeft);
+                            console.log('scale', scaleX, scaleY);
+                                /*var scaleImageX =
+                                    scaleImageY = */
+                                me.getTransformDetails()[iconTopLeft.id].scaleX = scaleX;
+                                me.getTransformDetails()[iconTopLeft.id].scaleY = scaleY;
                                 me.getTransformDetails()[image.id].scaleX = scaleX;
                                 me.getTransformDetails()[image.id].scaleY = scaleY;
+                                me.updateTransform(iconTopLeft);
                                 me.updateTransform(image);
 
-                                var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
+                                /*var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
                                     valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
                                     valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
                                     valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
 
                                 console.log('transsformer',valorX, valorY);
-                                me.getTransformDetails()[iconTopLeft.id].x = (me.getTransformDetails()[image.id].x - valorX) - 12;
+                                /*me.getTransformDetails()[iconTopLeft.id].x = (me.getTransformDetails()[image.id].x - valorX) - 12;
                                 me.getTransformDetails()[iconTopLeft.id].y = (me.getTransformDetails()[image.id].y - valorY) - 10;
-                                me.updateTransform(iconTopLeft);
-                            }
+                                me.updateTransform(iconTopLeft);*/
+                            //}
                         }
                     }
                 });
 
-                var xR = image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
+                /*var xR = image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
                     yR = image.element.dom.offsetTop + (image.element.dom.clientHeight - 7);
 
 
@@ -371,9 +397,9 @@ console.log('drop..', drop);
 
     updateTransform:function(image){
         var me = this;
-        console.log('update', me.getTransformDetails()[image.id]);
-        image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
-            + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
+        //console.log('update', me.getTransformDetails()[image.id]);
+        image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scaleX
+            + ') scaleY(' + me.getTransformDetails()[image.id].scaleY + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
 
         image.setLeft(me.getTransformDetails()[image.id].x);
