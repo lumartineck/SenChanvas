@@ -28,8 +28,8 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                 initialize: 'onDraggsCntInit'
             },
             /*dropCnt: {
-                initialize: 'onDropCntInit'
-            },*/
+             initialize: 'onDropCntInit'
+             },*/
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             },
@@ -50,6 +50,9 @@ Ext.define('SenChanvas.controller.tablet.Main', {
             },
             'button[action=clearDroppable]':{
                 tap:'onClearButtonTap'
+            },
+            'button[action=expand]':{
+                tap:'onExpandButtonTap'
             }
         }
     },
@@ -161,6 +164,7 @@ console.log('drop..', drop);
                 height: 100,
                 style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
             });
+        me.setSelectedImage(newImage);
         me.addListeners(newImage, x, y);
         dragg.destroy();
     },
@@ -176,9 +180,7 @@ console.log('drop..', drop);
     },
 
     addListeners:function(image, x, y){
-        var me = this,
-            imageCmp = Ext.getCmp('image' + this.id);
-        console.log('componente image', imageCmp);
+        var me = this;
         me.getTransformDetails()[image.id] = {
             scale: 1,
             angle: 0,
@@ -186,7 +188,7 @@ console.log('drop..', drop);
             y: y,
             lastAngle : null
         };
-        console.log('transformDetails', me.getTransformDetails());
+        console.log(me.getTransformDetails());
         image.on({
             pinch: {
                 element: 'element',
@@ -218,18 +220,32 @@ console.log('drop..', drop);
             drag: {
                 element: 'element',
                 fn: function (e) {
-                    console.log('e', e);
-                    if( e.getTarget('div.circleBase')){
-                        //console.log('entraaaa',me.getTransformDetails()[imageCmp.id].scale=2);
-                        me.getTransformDetails()[imageCmp.id].scale = me.getTransformDetails()[imageCmp.id].scale + 1;
-                        me.updateTransform(imageCmp);
-                        me.updateTransformCorner(image, imageCmp);
-                    } else {
-                        me.setSelectedImage(image);
-                        me.getTransformDetails()[image.id].x += e.previousDeltaX;
+                    console.log('imageeeen', image);
+                    var domElement = me.getDropCnt().element.dom,
+                        scale = me.getTransformDetails()[image.id].scale,
+                        scaledIncrement = (((image.getHeight() * scale) - image.getHeight()) / 2),
+                        limitTop = image.getTop() - scaledIncrement + me.getButtonsAct().element.dom.offsetHeight+ 10/*padding*/ + e.previousDeltaY,
+                        dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
+                        limitBottom = image.getTop() + image.getHeight() + scaledIncrement + 10 /*pading*/ + e.previousDeltaY,
+                        limitLeft = image.getLeft() - scaledIncrement + 6 /*pading*/ + e.previousDeltaX,
+                        dropRigth = domElement.offsetLeft + domElement.offsetWidth,
+                        limitRight = image.getLeft() + image.getWidth() + scaledIncrement + 10 /*pading*/ + e.previousDeltaX;
+
+                    console.log(domElement.offsetTop, limitTop, domElement.offsetLeft, limitLeft, dropRigth, limitRight, dropBottom, limitBottom);
+                    console.log(image.getTop(), ((image.getTop() * scale) - image.getTop()) / 2);
+                    me.setSelectedImage(image);
+                    if(domElement.offsetTop < limitTop
+                        && dropBottom > limitBottom){
+                        console.log('entro limite top bottom');
                         me.getTransformDetails()[image.id].y += e.previousDeltaY;
-                        me.updateTransform(image);
                     }
+                    if(domElement.offsetLeft < limitLeft
+                        && dropRigth > limitRight){
+                        console.log('entro limite left rigth');
+                        me.getTransformDetails()[image.id].x += e.previousDeltaX;
+                    }
+                    //me.getTransformDetails()[image.id].scale = 1.5;
+                    me.updateTransform(image);
                 },
                 scope:me
             },
@@ -374,5 +390,8 @@ console.log('drop..', drop);
         droppable.removeAll(true,true);
 
         me.createContImages();
+    },
+    onExpandButtonTap:function(){
+
     }
 });

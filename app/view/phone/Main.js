@@ -50,6 +50,7 @@ Ext.define('SenChanvas.view.phone.Main', {
                         },
                         items: [
                             {xtype: 'spacer'},
+                            {iconCls: 'add', action: 'expand'},
                             {iconCls: 'refresh', action: 'rotateR'},
                             {iconCls: 'refresh', action: 'rotateL'},
                             {iconCls: 'arrow_up', action: 'toFront'},
