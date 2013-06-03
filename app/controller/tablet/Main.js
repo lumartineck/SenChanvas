@@ -159,9 +159,9 @@ console.log('drop..', drop);
                 xtype: 'component',
                 top: y,
                 left: x,
-                width: 100,
-                height: 100,
-                style: "background-image: url('"+src+"'); background-size:100px 100px; background-repeat:no-repeat"
+                width: 50,
+                height: 50,
+                style: "background-image: url('"+src+"'); background-size:50px 50px; background-repeat:no-repeat"
             });
         me.setSelectedImage(newImage);
         me.addListeners(newImage, x, y);
