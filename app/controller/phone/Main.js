@@ -179,12 +179,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
 
     addListeners:function(image, x, y){
-        var me = this,
-            imageCmp = Ext.getCmp('image' + this.id);
-        console.log('componente image', imageCmp);
+        var me = this;
         me.getTransformDetails()[image.id] = {
-            scaleX: 1,
-            scaleY: 1,
+            scale: 1,
             angle: 0,
             x: x,
             y: y,
@@ -197,8 +194,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 fn: function (e) {
                     me.setSelectedImage(image);
                     // Get the scale property from the event
-                    me.getTransformDetails()[image.id].scaleX = e.scale;
-                    me.getTransformDetails()[image.id].scaleY = e.scale;
+                    me.getTransformDetails()[image.id].scale = e.scale;
                     me.updateTransform(image);
                 },
                 scope:me
@@ -268,7 +264,15 @@ Ext.define('SenChanvas.controller.phone.Main', {
         //console.log('setSelected', dropCnt.getItems().items);
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
-                var xL = me.getTransformDetails()[image.id].x - 12,
+                item.setStyle({
+                    border: '5px solid black'
+                    //borderImage: 'url("./resources/images/border4.png") 25% repeat repeat'
+                });
+            } else {
+                item.setStyle({
+                    border: '5px'
+                });
+                /*var xL = me.getTransformDetails()[image.id].x - 12,
                     yL = me.getTransformDetails()[image.id].y - 10;
                 var iconTopLeft = dropCnt.add({
                     xtype: 'component',
@@ -317,9 +321,6 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 var xR = image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
                     yR = image.element.dom.offsetTop + (image.element.dom.clientHeight - 7);
 
-                /*var xR = me.getTransformDetails()[image.id].x + (image.element.dom.clientHeight - 9),
-                    yR = me.getTransformDetails()[image.id].y + (image.element.dom.clientHeight - 7);*/
-
 
                 var iconBottomRight = dropCnt.add({
                     xtype: 'container',
@@ -362,7 +363,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                             }
                         }
                     }
-                });
+                });*/
             }
         });
         me.setSelected(image);
@@ -371,8 +372,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
     updateTransform:function(image){
         var me = this;
         console.log('update', me.getTransformDetails()[image.id]);
-        image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scaleX
-            + ') scaleY(' + me.getTransformDetails()[image.id].scaleY + ') rotate('
+        image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scale
+            + ') scaleY(' + me.getTransformDetails()[image.id].scale + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
 
         image.setLeft(me.getTransformDetails()[image.id].x);

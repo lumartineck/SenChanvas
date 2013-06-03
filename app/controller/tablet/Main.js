@@ -157,7 +157,6 @@ console.log('drop..', drop);
             src = dragg._src,
             newImage = dropCnt.add({
                 xtype: 'component',
-                id: 'image' + this.id,
                 top: y,
                 left: x,
                 width: 100,
@@ -188,7 +187,7 @@ console.log('drop..', drop);
             y: y,
             lastAngle : null
         };
-        console.log(me.getTransformDetails());
+        console.log('transformDetails', me.getTransformDetails());
         image.on({
             pinch: {
                 element: 'element',
@@ -265,30 +264,106 @@ console.log('drop..', drop);
         //console.log('setSelected', dropCnt.getItems().items);
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
-                var xLeft = image.element.dom.offsetLeft - 12,
-                    yTop = image.element.dom.offsetTop - 10;
+                item.setStyle({
+                    border: '5px solid black'
+                    //borderImage: 'url("./resources/images/border4.png") 25% repeat repeat'
+                });
+            } else {
+                item.setStyle({
+                    border: '5px'
+                });
+                /*var xL = me.getTransformDetails()[image.id].x - 12,
+                    yL = me.getTransformDetails()[image.id].y - 10;
                 var iconTopLeft = dropCnt.add({
-                    xtype: 'container',
-                    top: yTop,
-                    left: xLeft,
+                    xtype: 'component',
+                    top: yL,
+                    left: xL,
                     width: 20,
                     height: 20,
                     cls: 'circleBase circle'
                 });
-                console.log(image);
-                iconTopLeft.setZIndex(image._zIndex + 1);
-                me.addListeners(iconTopLeft, xLeft, yTop);
+                //iconTopLeft.setZIndex(image._zIndex + 1);
+
+                me.getTransformDetails()[iconTopLeft.id] = {
+                    scaleX: 1,
+                    scaleY: 1,
+                    angle: 0,
+                    x: xL,
+                    y: yL,
+                    lastAngle : null
+                };
+
+                iconTopLeft.on({
+                    drag: {
+                        element: 'element',
+                        fn: function (e, node) {
+                            if( e.getTarget('div.circleBase')){
+                                var scaleX = e.startX / e.pageX,
+                                    scaleY = e.startY / e.pageY;
+                                me.getTransformDetails()[image.id].scaleX = scaleX;
+                                me.getTransformDetails()[image.id].scaleY = scaleY;
+                                me.updateTransform(image);
+
+                                var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
+                                    valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
+                                    valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
+                                    valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
+
+                                console.log('transsformer',valorX, valorY);
+                                me.getTransformDetails()[iconTopLeft.id].x = (me.getTransformDetails()[image.id].x - valorX) - 12;
+                                me.getTransformDetails()[iconTopLeft.id].y = (me.getTransformDetails()[image.id].y - valorY) - 10;
+                                me.updateTransform(iconTopLeft);
+                            }
+                        }
+                    }
+                });
+
+                var xR = image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
+                    yR = image.element.dom.offsetTop + (image.element.dom.clientHeight - 7);
+
 
                 var iconBottomRight = dropCnt.add({
                     xtype: 'container',
-                    top: image.element.dom.offsetTop + (image.element.dom.clientHeight - 7),
-                    left: image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
+                    top: yR,
+                    left: xR,
                     width: 20,
                     height: 20,
                     cls: 'circleBase circle'
                 });
-                console.log(image);
-                iconBottomRight.setZIndex(image._zIndex + 1);
+
+                me.getTransformDetails()[iconBottomRight.id] = {
+                    scaleX: 1,
+                    scaleY: 1,
+                    angle: 0,
+                    x: xR,
+                    y: yR,
+                    lastAngle : null
+                };
+
+                iconBottomRight.on({
+                    drag: {
+                        element: 'element',
+                        fn: function (e, node) {
+                            if( e.getTarget('div.circleBase')){
+                                var scaleX = e.pageX / e.startX,
+                                    scaleY = e.pageY / e.startY;
+                                me.getTransformDetails()[image.id].scaleX = scaleX;
+                                me.getTransformDetails()[image.id].scaleY = scaleY;
+                                me.updateTransform(image);
+
+                                var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
+                                    valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
+                                    valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
+                                    valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
+
+                                console.log('transsformer',valorX, valorY);
+                                me.getTransformDetails()[iconBottomRight.id].x = (me.getTransformDetails()[image.id].x + image.element.dom.clientHeight + valorX);
+                                me.getTransformDetails()[iconBottomRight.id].y = (me.getTransformDetails()[image.id].y + image.element.dom.clientHeight + valorY);
+                                me.updateTransform(iconBottomRight);
+                            }
+                        }
+                    }
+                });*/
             }
         });
         me.setSelected(image);
@@ -303,20 +378,6 @@ console.log('drop..', drop);
 
         image.setLeft(me.getTransformDetails()[image.id].x);
         image.setTop(me.getTransformDetails()[image.id].y);
-    },
-
-    updateTransformCorner: function(imageCorner, image){
-        console.log('updateTransform', image);
-        var me = this;
-        //console.log('update', me.getTransformDetails()[imageCorner.id]);
-        imageCorner.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[imageCorner.id].scale
-            + ') scaleY(' + me.getTransformDetails()[imageCorner.id].scale + ') rotate('
-            + me.getTransformDetails()[imageCorner.id].angle + 'deg)');
-
-        console.log('didirer',image);
-        imageCorner.setLeft(image.element.dom.offsetLeft - 60);
-        imageCorner.setTop(image.element.dom.offsetTop - 55);
-        imageCorner.setZIndex(image._zIndex + 1);
     },
 
     onItemTouchStart:function ( dataview, index, target, record, e, eOpts ) {
