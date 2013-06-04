@@ -9,7 +9,6 @@ Ext.define('SenChanvas.controller.phone.Main', {
     config: {
         transformDetails: [],
         selected:undefined,
-        selectedShadow:undefined,
         rotationAngle:10,
         minZIndex:undefined,
         maxZIndex:undefined,
@@ -145,13 +144,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             heightButtons = me.getButtonsAct().element.dom.offsetHeight;
         console.log('Dropped', arguments);
         var dropCnt = me.getDropCnt();
-        var dragg = Ext.getCmp(draggable.getElement().getId()),
-            selectShadow = me.getSelectedShadow();
-
-        console.log('selectedshadow',selectShadow);
-        if(selectShadow){
-            selectShadow.setHidden(true);
-        }
+        var dragg = Ext.getCmp(draggable.getElement().getId());
 
         console.log('AQUI', dragg, draggable);
 
@@ -277,16 +270,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             tap: {
                 element: 'element',
                 fn: function (e, node) {
-                    console.log('shadow selecc', me.getSelectedShadow());
-                    var imageSomLast = me.getSelectedShadow(),
-                        imageSom = me.getTransformDetails()[image.id].shadow;
-
-                    imageSomLast.setHidden(true);
-
-                    console.log('sombra',imageSom);
-                    imageSom.setHidden(false);
                     me.setSelectedImage(image);
-                    me.setSelectedShadow(imageSom);
                 },
                 scope:me
             }
@@ -296,13 +280,12 @@ Ext.define('SenChanvas.controller.phone.Main', {
     setSelectedImage:function(image){
         var me =this,
             dropCnt = me.getDropCnt();
-
-        if(!me.getTransformDetails()[image.id].shadow){
             console.log('entrooooo');
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
                 var xL = me.getTransformDetails()[image.id].x -10,
                     yL = me.getTransformDetails()[image.id].y -10;
+                if(!me.getTransformDetails()[image.id].shadow){
                 var imageShadow = dropCnt.add({
                     xtype: 'component',
                     top: yL,
@@ -330,19 +313,20 @@ Ext.define('SenChanvas.controller.phone.Main', {
                     drag: {
                         element: 'element',
                         fn: function (e, node) {
-                            var imageShadow = me.getSelectedShadow();
+                            var scaleX, scaleY;
                             console.log('eeee', e, e.pageX, e.pageY);
+                            console.log('compare', e.startX, image.getLeft() + image.getWidth() + 10);
 
-                            if(e.pageX < e.startX){
-                                var scaleX =  e.pageX / e.startX;
+                            if(e.pageX > e.startX){
+                                scaleX =  e.pageX / e.startX;
                             } else {
-                                var scaleX = e.pageX / e.startX;
+                                scaleX = e.pageX / e.startX;
                             }
 
-                            if(e.pageY < e.startY){
-                                var scaleY =  e.startY / e.pageY;
+                            if(e.pageY > e.startY){
+                                scaleY = e.pageY / e.startY;
                             } else {
-                                var scaleY =  e.startY / e.pageY;
+                                scaleY = e.pageY / e.startY;
                             }
 
 
@@ -357,11 +341,19 @@ Ext.define('SenChanvas.controller.phone.Main', {
                         }
                     }
                 });
-                me.setSelectedShadow(imageShadow);
+                } else {
+                    me.getTransformDetails()[image.id].shadow.setHidden(false);
+                }
+                /*setTimeout(function(){
+                    me.getTransformDetails()[item.id].shadow.setHidden(true);
+                }, 3000);*/
+            } else {
+                if(me.getTransformDetails()[item.id].shadow){
+                    me.getTransformDetails()[item.id].shadow.setHidden(true);
+                }
             }
+
         });
-        me.setSelected(image);
-        }
         me.setSelected(image);
     },
 
@@ -413,7 +405,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     rotate:function(angle){
         var me = this,
             image = me.getSelected(),
-            imageShadow = me.getSelectedShadow();
+            imageShadow = me.getTransformDetails()[image.id].shadow;
 
         me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
         me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + angle;
@@ -427,7 +419,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     onButtonToFrontTap:function(){
         var me = this,
             image = me.getSelected(),
-            imageShadow = me.getSelectedShadow(),
+            imageShadow = me.getTransformDetails()[image.id].shadow,
             zIndex = me.getMaxZIndex()?me.getMaxZIndex()+1:100;
 
         image.setZIndex(zIndex);
@@ -437,7 +429,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     onButtonToBackTap:function(){
         var me = this,
             image = me.getSelected(),
-            imageShadow = me.getSelectedShadow(),
+            imageShadow = me.getTransformDetails()[image.id].shadow,
             zIndex = (me.getMinZIndex() || me.getMinZIndex() == 0) ? me.getMinZIndex()-1 : 0;
 
         image.setZIndex(zIndex);
@@ -460,7 +452,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     onExpandButtonTap: function () {
         var me = this,
             image = me.getSelected(),
-            imageShadow = me.getSelectedShadow();
+            imageShadow = me.getTransformDetails()[image.id].shadow;
         if (image) {
             var domElement = me.getDropCnt().element.dom,
                 dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
