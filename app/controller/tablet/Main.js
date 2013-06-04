@@ -125,7 +125,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
         var drop = Ext.create('Ext.ux.util.Droppable', {
             element: el.element
         });
-console.log('drop..', drop);
+        console.log('drop..', drop);
         drop.on({
             scope: me,
             drop: me.onDrop
@@ -147,7 +147,7 @@ console.log('drop..', drop);
         var dragg = Ext.getCmp(draggable.getElement().getId());
         console.log('AQUI', dragg, draggable);
 
-        if (!droppable.cleared) {
+            if (!droppable.cleared) {
             dropCnt.setHtml('');
             droppable.cleared = true;
         }
@@ -177,12 +177,12 @@ console.log('drop..', drop);
 
     onShowPrincipal: function (c) {
         /*console.log(c);
-        var me = this,
-            redSquare = c.down('#redSquare'),
-            blueSquare = c.down('#blueSquare');
+         var me = this,
+         redSquare = c.down('#redSquare'),
+         blueSquare = c.down('#blueSquare');
 
-        me.addListeners(redSquare, 10, 10);
-        me.addListeners(blueSquare, 200, 10);*/
+         me.addListeners(redSquare, 10, 10);
+         me.addListeners(blueSquare, 200, 10);*/
     },
 
     addListeners:function(image, x, y){
@@ -194,7 +194,8 @@ console.log('drop..', drop);
             angle: 0,
             x: x,
             y: y,
-            lastAngle : null
+            lastAngle : null,
+            shadow:null
         };
         console.log('transformDetails', me.getTransformDetails());
         image.on({
@@ -241,26 +242,16 @@ console.log('drop..', drop);
 
                         limitLeft = image.getLeft() - scaledIncrementX + 6 /*pading*/ + e.previousDeltaX,
                         dropRigth = domElement.offsetLeft + domElement.offsetWidth,
-                        limitRight = image.getLeft() + image.getWidth() + scaledIncrementX + 10 /*pading*/ + e.previousDeltaX,
-                        imageSom = me.getDropCnt().items.items[1];
+                        limitRight = image.getLeft() + image.getWidth() + scaledIncrementX + 10 /*pading*/ + e.previousDeltaX;
                     console.log(domElement.offsetTop, limitTop, domElement.offsetLeft, limitLeft, dropRigth, limitRight, dropBottom, limitBottom);
-                    //console.log(image.getTop(), ((image.getTop() * scale) - image.getTop()) / 2);
-                    //me.setSelectedImage(image);
-                    console.log(imageSom);
-                    me.getTransformDetails()[imageSom.id] = {
-                        scaleX: 1,
-                        scaleY: 1,
-                        angle: 0,
-                        x: imageSom.element.dom.offsetLeft,
-                        y: imageSom.element.dom.offsetTop,
-                        lastAngle : null
-                    };
 
+                    me.setSelectedImage(image);
+                    var imageSom = me.getTransformDetails()[image.id].shadow
                     if(domElement.offsetTop < limitTop
                         && dropBottom > limitBottom){
                         console.log('entro limite top bottom');
                         me.getTransformDetails()[image.id].y += e.previousDeltaY;
-                        me.getTransformDetails()[imageSom.id].y += e.previousDeltaY
+                        me.getTransformDetails()[imageSom.id].y += e.previousDeltaY // aca esta bien cambiar la coordenada solo que pienso que debes de darle un poquito mas arriba o algo asi pero ya veras tu
                     }
                     if(domElement.offsetLeft < limitLeft
                         && dropRigth > limitRight){
@@ -292,7 +283,7 @@ console.log('drop..', drop);
             if(item.id == image.id) {
                 var xL = me.getTransformDetails()[image.id].x -10,
                     yL = me.getTransformDetails()[image.id].y -10;
-                var iconTopLeft = dropCnt.add({
+                var imageShadow = dropCnt.add({
                     xtype: 'component',
                     top: yL,
                     left: xL,
@@ -300,9 +291,13 @@ console.log('drop..', drop);
                     height: 120,
                     style: "background-image: url('./resources/images/border4.png'); background-size:120px 120px; background-repeat:no-repeat"
                 });
-                iconTopLeft.setZIndex(image._zIndex - 1);
+                imageShadow.setZIndex(image._zIndex - 1);
 
-                me.getTransformDetails()[iconTopLeft.id] = {
+                //se guarfa la referencia entre la imagen y su sombra
+                me.getTransformDetails()[image.id].shadow = imageShadow;
+
+                //Estos son los detalles de imageShadow para ser utilizados cuando se manda a llamar updateTransform
+                me.getTransformDetails()[imageShadow.id] = {
                     scaleX: 1,
                     scaleY: 1,
                     angle: 0,
@@ -311,23 +306,24 @@ console.log('drop..', drop);
                     lastAngle : null
                 };
 
-                iconTopLeft.on({
+                imageShadow.on({
                     drag: {
                         element: 'element',
                         fn: function (e, node) {
+                            console.log('eeee',e);
                             //if( e.getTarget('div.circleBase')){
                                 var scaleX =  e.pageX / e.startX,
                                     scaleY =  e.startY / e.pageY;
 
-                            console.log('icon',iconTopLeft);
+                            console.log('icon',imageShadow);
                             console.log('scale', scaleX, scaleY);
                                 /*var scaleImageX =
                                     scaleImageY = */
-                                me.getTransformDetails()[iconTopLeft.id].scaleX = scaleX;
-                                me.getTransformDetails()[iconTopLeft.id].scaleY = scaleY;
+                                me.getTransformDetails()[imageShadow.id].scaleX = scaleX;
+                                me.getTransformDetails()[imageShadow.id].scaleY = scaleY;
                                 me.getTransformDetails()[image.id].scaleX = scaleX;
                                 me.getTransformDetails()[image.id].scaleY = scaleY;
-                                me.updateTransform(iconTopLeft);
+                                me.updateTransform(imageShadow);
                                 me.updateTransform(image);
 
                                 /*var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,

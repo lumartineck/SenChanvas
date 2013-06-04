@@ -9,6 +9,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     config: {
         transformDetails: [],
         selected:undefined,
+        selectedShadow:undefined,
         rotationAngle:10,
         minZIndex:undefined,
         maxZIndex:undefined,
@@ -144,7 +145,14 @@ Ext.define('SenChanvas.controller.phone.Main', {
             heightButtons = me.getButtonsAct().element.dom.offsetHeight;
         console.log('Dropped', arguments);
         var dropCnt = me.getDropCnt();
-        var dragg = Ext.getCmp(draggable.getElement().getId());
+        var dragg = Ext.getCmp(draggable.getElement().getId()),
+            selectShadow = me.getSelectedShadow();
+
+        console.log('selectedshadow',selectShadow);
+        if(selectShadow){
+            selectShadow.setHidden(true);
+        }
+
         console.log('AQUI', dragg, draggable);
 
             if (!droppable.cleared) {
@@ -190,15 +198,6 @@ Ext.define('SenChanvas.controller.phone.Main', {
     addListeners:function(image, x, y){
         var me = this;
 
-        /*me.getTransformDetails()[image.id] = {
-            scaleX: 1,
-            scaleY: 1,
-            angle: 0,
-            x: x,
-            y: y,
-            lastAngle : null,
-            shadow:null
-        };*/
         console.log('transformDetails', me.getTransformDetails());
         image.on({
             pinch: {
@@ -253,7 +252,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                         && dropBottom > limitBottom){
                         console.log('entro limite top bottom');
                         me.getTransformDetails()[image.id].y += e.previousDeltaY;
-                        me.getTransformDetails()[imageSom.id].y += e.previousDeltaY // aca esta bien cambiar la coordenada solo que pienso que debes de darle un poquito mas arriba o algo asi pero ya veras tu
+                        me.getTransformDetails()[imageSom.id].y += e.previousDeltaY
                     }
                     if(domElement.offsetLeft < limitLeft
                         && dropRigth > limitRight){
@@ -261,7 +260,6 @@ Ext.define('SenChanvas.controller.phone.Main', {
                         me.getTransformDetails()[image.id].x += e.previousDeltaX;
                         me.getTransformDetails()[imageSom.id].x += e.previousDeltaX;
                     }
-                    //me.getTransformDetails()[image.id].scale = 1.5;
                     me.updateTransform(image);
                     me.updateTransform(imageSom);
                 },
@@ -270,7 +268,11 @@ Ext.define('SenChanvas.controller.phone.Main', {
             tap: {
                 element: 'element',
                 fn: function (e, node) {
-                    console.log('tappp', me.getTransformDetails()[image.id].shadow);
+                    me.setSelectedShadow(image);
+                    var selectedImage = me.getSelectedShadow();
+
+                    selectedImage.setHidden(false);
+                    console.log('tappp', me.getSelected());
                     me.setSelectedImage(image);
                 },
                 scope:me
@@ -299,11 +301,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 });
                 imageShadow.setZIndex(image._zIndex - 1);
 
-                //se guarfa la referencia entre la imagen y su sombra
                 me.getTransformDetails()[image.id].shadow = imageShadow;
                 console.log('creado el shadow', me.getTransformDetails()[image.id].shadow);
 
-                //Estos son los detalles de imageShadow para ser utilizados cuando se manda a llamar updateTransform
                 me.getTransformDetails()[imageShadow.id] = {
                     scaleX: 1,
                     scaleY: 1,
@@ -318,83 +318,24 @@ Ext.define('SenChanvas.controller.phone.Main', {
                         element: 'element',
                         fn: function (e, node) {
                             console.log('eeee',e);
-                            //if( e.getTarget('div.circleBase')){
                                 var scaleX =  e.pageX / e.startX,
                                     scaleY =  e.startY / e.pageY;
 
                             console.log('icon',imageShadow);
                             console.log('scale', scaleX, scaleY);
-                                /*var scaleImageX =
-                                    scaleImageY = */
                                 me.getTransformDetails()[imageShadow.id].scaleX = scaleX;
                                 me.getTransformDetails()[imageShadow.id].scaleY = scaleY;
                                 me.getTransformDetails()[image.id].scaleX = scaleX;
                                 me.getTransformDetails()[image.id].scaleY = scaleY;
                                 me.updateTransform(imageShadow);
                                 me.updateTransform(image);
-
-                                /*var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
-                                    valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
-                                    valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
-                                    valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
-
-                                console.log('transsformer',valorX, valorY);
-                                /*me.getTransformDetails()[iconTopLeft.id].x = (me.getTransformDetails()[image.id].x - valorX) - 12;
-                                me.getTransformDetails()[iconTopLeft.id].y = (me.getTransformDetails()[image.id].y - valorY) - 10;
-                                me.updateTransform(iconTopLeft);*/
-                            //}
                         }
                     }
                 });
-
-                /*var xR = image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
-                    yR = image.element.dom.offsetTop + (image.element.dom.clientHeight - 7);
-
-
-                var iconBottomRight = dropCnt.add({
-                    xtype: 'container',
-                    top: yR,
-                    left: xR,
-                    width: 20,
-                    height: 20,
-                    cls: 'circleBase circle'
-                });
-
-                me.getTransformDetails()[iconBottomRight.id] = {
-                    scaleX: 1,
-                    scaleY: 1,
-                    angle: 0,
-                    x: xR,
-                    y: yR,
-                    lastAngle : null
-                };
-
-                iconBottomRight.on({
-                    drag: {
-                        element: 'element',
-                        fn: function (e, node) {
-                            if( e.getTarget('div.circleBase')){
-                                var scaleX = e.pageX / e.startX,
-                                    scaleY = e.pageY / e.startY;
-                                me.getTransformDetails()[image.id].scaleX = scaleX;
-                                me.getTransformDetails()[image.id].scaleY = scaleY;
-                                me.updateTransform(image);
-
-                                var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
-                                    valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
-                                    valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
-                                    valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
-
-                                console.log('transsformer',valorX, valorY);
-                                me.getTransformDetails()[iconBottomRight.id].x = (me.getTransformDetails()[image.id].x + image.element.dom.clientHeight + valorX);
-                                me.getTransformDetails()[iconBottomRight.id].y = (me.getTransformDetails()[image.id].y + image.element.dom.clientHeight + valorY);
-                                me.updateTransform(iconBottomRight);
-                            }
-                        }
-                    }
-                });*/
+                me.setSelectedShadow(imageShadow);
             }
         });
+        me.setSelected(image);
         }
     },
 
@@ -411,11 +352,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
     onItemTouchStart:function ( dataview, index, target, record, e, eOpts ) {
 
-        // alert('touchstart');
         Ext.create('Ext.util.Draggable', {
             element: "image-"+record.get('id'),
             threshold: 0,
-            //direction: 'vertical',
             animationDuration: 100,
             draggable: true,
             listeners:{
@@ -430,7 +369,6 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 }
             }
         });
-        // Ext.get("image-"+record.get('id')).hide();
     },
 
 
