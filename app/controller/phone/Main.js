@@ -167,9 +167,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 xtype: 'component',
                 top: y,
                 left: x,
-                width: 50,
-                height: 50,
-                style: "background-image: url('"+src+"'); background-size:50px 50px; background-repeat:no-repeat"
+                width: 70,
+                height: 70,
+                style: "background-image: url('"+src+"'); background-size:70px 70px; background-repeat:no-repeat"
             });
             me.getTransformDetails()[newImage.id] = {
                 scaleX: 1,
@@ -204,10 +204,14 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 element: 'element',
                 fn: function (e) {
                     me.setSelectedImage(image);
+                    var imageSom = me.getTransformDetails()[image.id].shadow;
                     // Get the scale property from the event
                     me.getTransformDetails()[image.id].scaleX = e.scale;
                     me.getTransformDetails()[image.id].scaleY = e.scale;
+                    me.getTransformDetails()[imageSom.id].scaleX = e.scale;
+                    me.getTransformDetails()[imageSom.id].scaleY = e.scale;
                     me.updateTransform(image);
+                    me.updateTransform(imageSom);
                 },
                 scope:me
             },
@@ -215,7 +219,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 element: 'element',
                 fn: function (e) {
                     me.setSelectedImage(image);
+                    var imageSom = me.getTransformDetails()[image.id].shadow;
                     me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
+                    me.getTransformDetails()[imageSom.id].lastAngle = me.getTransformDetails()[imageSom.id].angle;
                 },
                 scope:me
             },
@@ -223,8 +229,11 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 element: 'element',
                 fn: function (e) {
                     me.setSelectedImage(image);
+                    var imageSom = me.getTransformDetails()[image.id].shadow;
                     me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + e.rotation;
+                    me.getTransformDetails()[imageSom.id].angle = me.getTransformDetails()[imageSom.id].lastAngle + e.rotation;
                     me.updateTransform(image);
+                    me.updateTransform(imageSom);
                 },
                 scope:me
             },
@@ -268,12 +277,16 @@ Ext.define('SenChanvas.controller.phone.Main', {
             tap: {
                 element: 'element',
                 fn: function (e, node) {
-                    me.setSelectedShadow(image);
-                    var selectedImage = me.getSelectedShadow();
+                    console.log('shadow selecc', me.getSelectedShadow());
+                    var imageSomLast = me.getSelectedShadow(),
+                        imageSom = me.getTransformDetails()[image.id].shadow;
 
-                    selectedImage.setHidden(false);
-                    console.log('tappp', me.getSelected());
+                    imageSomLast.setHidden(true);
+
+                    console.log('sombra',imageSom);
+                    imageSom.setHidden(false);
                     me.setSelectedImage(image);
+                    me.setSelectedShadow(imageSom);
                 },
                 scope:me
             }
@@ -283,7 +296,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     setSelectedImage:function(image){
         var me =this,
             dropCnt = me.getDropCnt();
-        console.log('setSelected', me.getTransformDetails()[image.id].shadow);
+
         if(!me.getTransformDetails()[image.id].shadow){
             console.log('entrooooo');
         Ext.each(dropCnt.getItems().items, function(item){
@@ -294,10 +307,10 @@ Ext.define('SenChanvas.controller.phone.Main', {
                     xtype: 'component',
                     top: yL,
                     left: xL,
-                    width: 70,
-                    height: 70,
+                    width: 90,
+                    height: 90,
                     //src: './resources/images/border4.png'
-                    style: "background-image: url('./resources/images/border4.png'); background-size:70px 70px; background-repeat:no-repeat"
+                    style: "background-image: url('./resources/images/border4.png'); background-size:90px 90px; background-repeat:no-repeat"
                 });
                 imageShadow.setZIndex(image._zIndex - 1);
 
@@ -317,12 +330,24 @@ Ext.define('SenChanvas.controller.phone.Main', {
                     drag: {
                         element: 'element',
                         fn: function (e, node) {
-                            console.log('eeee',e);
-                                var scaleX =  e.pageX / e.startX,
-                                    scaleY =  e.startY / e.pageY;
+                            var imageShadow = me.getSelectedShadow();
+                            console.log('eeee', e, e.pageX, e.pageY);
+
+                            if(e.pageX < e.startX){
+                                var scaleX =  e.pageX / e.startX;
+                            } else {
+                                var scaleX = e.pageX / e.startX;
+                            }
+
+                            if(e.pageY < e.startY){
+                                var scaleY =  e.startY / e.pageY;
+                            } else {
+                                var scaleY =  e.startY / e.pageY;
+                            }
+
 
                             console.log('icon',imageShadow);
-                            console.log('scale', scaleX, scaleY);
+                            console.log('scale', e.pageX, e.startX, e.pageY, e.startY, scaleX, scaleY);
                                 me.getTransformDetails()[imageShadow.id].scaleX = scaleX;
                                 me.getTransformDetails()[imageShadow.id].scaleY = scaleY;
                                 me.getTransformDetails()[image.id].scaleX = scaleX;
@@ -387,30 +412,42 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
     rotate:function(angle){
         var me = this,
-            image = me.getSelected();
-        console.log('rotate', me.getTransformDetails());
+            image = me.getSelected(),
+            imageShadow = me.getSelectedShadow();
+
         me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
         me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + angle;
+
+        me.getTransformDetails()[imageShadow.id].lastAngle = me.getTransformDetails()[imageShadow.id].angle;
+        me.getTransformDetails()[imageShadow.id].angle = me.getTransformDetails()[imageShadow.id].lastAngle + angle;
         me.updateTransform(image);
+        me.updateTransform(imageShadow);
     },
 
     onButtonToFrontTap:function(){
         var me = this,
             image = me.getSelected(),
+            imageShadow = me.getSelectedShadow(),
             zIndex = me.getMaxZIndex()?me.getMaxZIndex()+1:100;
+
         image.setZIndex(zIndex);
+        imageShadow.setZIndex(zIndex);
         me.setMaxZIndex(zIndex);
     },
     onButtonToBackTap:function(){
         var me = this,
             image = me.getSelected(),
+            imageShadow = me.getSelectedShadow(),
             zIndex = (me.getMinZIndex() || me.getMinZIndex() == 0) ? me.getMinZIndex()-1 : 0;
+
         image.setZIndex(zIndex);
+        imageShadow.setZIndex(zIndex);
         me.setMinZIndex(zIndex);
     },
     onButtonDeleteTap:function(){
         if(this.getSelected()){
             this.getSelected().destroy();
+            this.getSelectedShadow().destroy();
         }
     },
     onClearButtonTap:function(){
@@ -422,7 +459,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
     },
     onExpandButtonTap: function () {
         var me = this,
-            image = me.getSelected();
+            image = me.getSelected(),
+            imageShadow = me.getSelectedShadow();
         if (image) {
             var domElement = me.getDropCnt().element.dom,
                 dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
@@ -430,15 +468,28 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 scaleX = dropRigth / image.getWidth() ,
                 scaleY = dropBottom / image.getHeight(),
                 scaledIncrementX = (((image.getWidth() * scaleX) - image.getWidth()) / 2),
-                scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2);
+                scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2),
+
+                scaleShadowX = dropRigth / imageShadow.getWidth(),
+                scaleShadowY = dropBottom / imageShadow.getHeight(),
+                scaledIncrementShadowX = (((imageShadow.getWidth() * scaleShadowX) - imageShadow.getWidth()) / 2),
+                scaledIncrementShadowY = (((imageShadow.getWidth() * scaleShadowY) - imageShadow.getWidth()) / 2);
 
             me.getTransformDetails()[image.id].scaleX = scaleX;
             me.getTransformDetails()[image.id].scaleY = scaleY;
 
-            me.getTransformDetails()[image.id].x = domElement.offsetLeft + scaledIncrementX - 5;
-            me.getTransformDetails()[image.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementY - 5;
+            me.getTransformDetails()[imageShadow.id].scaleX = scaleShadowX;
+            me.getTransformDetails()[imageShadow.id].scaleY = scaleShadowY;
+
+            me.getTransformDetails()[image.id].x = domElement.offsetLeft + scaledIncrementX - 3;
+            me.getTransformDetails()[image.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementY - 8;
+
+            me.getTransformDetails()[imageShadow.id].x = domElement.offsetLeft + scaledIncrementShadowX - 2;
+            me.getTransformDetails()[imageShadow.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementShadowY - 10;
             console.log(me.getTransformDetails()[image.id]);
+            console.log(me.getTransformDetails()[imageShadow.id]);
             me.updateTransform(image);
+            me.updateTransform(imageShadow);
         }
     }
 });
