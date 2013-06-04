@@ -194,7 +194,8 @@ Ext.define('SenChanvas.controller.phone.Main', {
             angle: 0,
             x: x,
             y: y,
-            lastAngle : null
+            lastAngle : null,
+            shadow:null
         };
         console.log('transformDetails', me.getTransformDetails());
         image.on({
@@ -242,25 +243,26 @@ Ext.define('SenChanvas.controller.phone.Main', {
                         limitLeft = image.getLeft() - scaledIncrementX + 6 /*pading*/ + e.previousDeltaX,
                         dropRigth = domElement.offsetLeft + domElement.offsetWidth,
                         limitRight = image.getLeft() + image.getWidth() + scaledIncrementX + 10 /*pading*/ + e.previousDeltaX,
-                        imageSom = me.getDropCnt().items.items[1];
+                        imageSom = me.getTransformDetails()[image.id].shadow;
                     console.log(domElement.offsetTop, limitTop, domElement.offsetLeft, limitLeft, dropRigth, limitRight, dropBottom, limitBottom);
                     //console.log(image.getTop(), ((image.getTop() * scale) - image.getTop()) / 2);
                     //me.setSelectedImage(image);
                     console.log(imageSom);
-                    me.getTransformDetails()[imageSom.id] = {
+                    /**Esto ya no es necesario por que ya lo creaste en el metodo setSelectedImage
+                     * me.getTransformDetails()[imageSom.id] = {
                         scaleX: 1,
                         scaleY: 1,
                         angle: 0,
-                        x: imageSom.element.dom.offsetLeft,
+                        x: imageSom.element.dom.offsetLeft, //Aparte aca le estas poniendo la misma x y y que ya traen
                         y: imageSom.element.dom.offsetTop,
                         lastAngle : null
-                    };
+                    };*/
 
                     if(domElement.offsetTop < limitTop
                         && dropBottom > limitBottom){
                         console.log('entro limite top bottom');
                         me.getTransformDetails()[image.id].y += e.previousDeltaY;
-                        me.getTransformDetails()[imageSom.id].y += e.previousDeltaY
+                        me.getTransformDetails()[imageSom.id].y += e.previousDeltaY // aca esta bien cambiar la coordenada solo que pienso que debes de darle un poquito mas arriba o algo asi pero ya veras tu
                     }
                     if(domElement.offsetLeft < limitLeft
                         && dropRigth > limitRight){
@@ -292,7 +294,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             if(item.id == image.id) {
                 var xL = me.getTransformDetails()[image.id].x -10,
                     yL = me.getTransformDetails()[image.id].y -10;
-                var iconTopLeft = dropCnt.add({
+                var imageShadow = dropCnt.add({
                     xtype: 'component',
                     top: yL,
                     left: xL,
@@ -300,9 +302,13 @@ Ext.define('SenChanvas.controller.phone.Main', {
                     height: 70,
                     style: "background-image: url('./resources/images/border4.png'); background-size:70px 70px; background-repeat:no-repeat"
                 });
-                iconTopLeft.setZIndex(image._zIndex - 1);
+                imageShadow.setZIndex(image._zIndex - 1);
 
-                me.getTransformDetails()[iconTopLeft.id] = {
+                //se guarfa la referencia entre la imagen y su sombra
+                me.getTransformDetails()[image.id].shadow = imageShadow;
+
+                //Estos son los detalles de imageShadow para ser utilizados cuando se manda a llamar updateTransform
+                me.getTransformDetails()[imageShadow.id] = {
                     scaleX: 1,
                     scaleY: 1,
                     angle: 0,
@@ -311,7 +317,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                     lastAngle : null
                 };
 
-                iconTopLeft.on({
+                imageShadow.on({
                     drag: {
                         element: 'element',
                         fn: function (e, node) {
@@ -320,15 +326,15 @@ Ext.define('SenChanvas.controller.phone.Main', {
                                 var scaleX =  e.pageX / e.startX,
                                     scaleY =  e.startY / e.pageY;
 
-                            console.log('icon',iconTopLeft);
+                            console.log('icon',imageShadow);
                             console.log('scale', scaleX, scaleY);
                                 /*var scaleImageX =
                                     scaleImageY = */
-                                me.getTransformDetails()[iconTopLeft.id].scaleX = scaleX;
-                                me.getTransformDetails()[iconTopLeft.id].scaleY = scaleY;
+                                me.getTransformDetails()[imageShadow.id].scaleX = scaleX;
+                                me.getTransformDetails()[imageShadow.id].scaleY = scaleY;
                                 me.getTransformDetails()[image.id].scaleX = scaleX;
                                 me.getTransformDetails()[image.id].scaleY = scaleY;
-                                me.updateTransform(iconTopLeft);
+                                me.updateTransform(imageShadow);
                                 me.updateTransform(image);
 
                                 /*var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
