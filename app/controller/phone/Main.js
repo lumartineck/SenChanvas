@@ -396,6 +396,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             }
         });
         }
+        me.setSelected(image);
     },
 
     updateTransform:function(image){
@@ -481,7 +482,25 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
         me.createContImages();
     },
-    onExpandButtonTap:function(){
+    onExpandButtonTap: function () {
+        var me = this,
+            image = me.getSelected();
+        if (image) {
+            var domElement = me.getDropCnt().element.dom,
+                dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
+                dropRigth = domElement.offsetLeft + domElement.offsetWidth,
+                scaleX = dropRigth / image.getWidth() ,
+                scaleY = dropBottom / image.getHeight(),
+                scaledIncrementX = (((image.getWidth() * scaleX) - image.getWidth()) / 2),
+                scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2);
 
+            me.getTransformDetails()[image.id].scaleX = scaleX;
+            me.getTransformDetails()[image.id].scaleY = scaleY;
+
+            me.getTransformDetails()[image.id].x = domElement.offsetLeft + scaledIncrementX - 5;
+            me.getTransformDetails()[image.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementY - 5;
+            console.log(me.getTransformDetails()[image.id]);
+            me.updateTransform(image);
+        }
     }
 });
