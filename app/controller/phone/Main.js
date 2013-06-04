@@ -242,22 +242,11 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
                         limitLeft = image.getLeft() - scaledIncrementX + 6 /*pading*/ + e.previousDeltaX,
                         dropRigth = domElement.offsetLeft + domElement.offsetWidth,
-                        limitRight = image.getLeft() + image.getWidth() + scaledIncrementX + 10 /*pading*/ + e.previousDeltaX,
-                        imageSom = me.getTransformDetails()[image.id].shadow;
+                        limitRight = image.getLeft() + image.getWidth() + scaledIncrementX + 10 /*pading*/ + e.previousDeltaX;
                     console.log(domElement.offsetTop, limitTop, domElement.offsetLeft, limitLeft, dropRigth, limitRight, dropBottom, limitBottom);
-                    //console.log(image.getTop(), ((image.getTop() * scale) - image.getTop()) / 2);
-                    //me.setSelectedImage(image);
-                    console.log(imageSom);
-                    /**Esto ya no es necesario por que ya lo creaste en el metodo setSelectedImage
-                     * me.getTransformDetails()[imageSom.id] = {
-                        scaleX: 1,
-                        scaleY: 1,
-                        angle: 0,
-                        x: imageSom.element.dom.offsetLeft, //Aparte aca le estas poniendo la misma x y y que ya traen
-                        y: imageSom.element.dom.offsetTop,
-                        lastAngle : null
-                    };*/
 
+                    me.setSelectedImage(image);
+                    var imageSom = me.getTransformDetails()[image.id].shadow
                     if(domElement.offsetTop < limitTop
                         && dropBottom > limitBottom){
                         console.log('entro limite top bottom');
@@ -279,6 +268,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             tap: {
                 element: 'element',
                 fn: function (e, node) {
+                    console.log('tappp', me.getTransformDetails()[image.id].shadow);
                     me.setSelectedImage(image);
                 },
                 scope:me
@@ -289,7 +279,9 @@ Ext.define('SenChanvas.controller.phone.Main', {
     setSelectedImage:function(image){
         var me =this,
             dropCnt = me.getDropCnt();
-        //console.log('setSelected', me.getTransformDetails()[image.id], image);
+        console.log('setSelected', me.getTransformDetails()[image.id].shadow);
+        if(!me.getTransformDetails()[image.id].shadow){
+            console.log('entrooooo');
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
                 var xL = me.getTransformDetails()[image.id].x -10,
@@ -300,6 +292,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                     left: xL,
                     width: 70,
                     height: 70,
+                    //src: './resources/images/border4.png'
                     style: "background-image: url('./resources/images/border4.png'); background-size:70px 70px; background-repeat:no-repeat"
                 });
                 imageShadow.setZIndex(image._zIndex - 1);
@@ -399,7 +392,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 });*/
             }
         });
-        me.setSelected(image);
+        }
     },
 
     updateTransform:function(image){
