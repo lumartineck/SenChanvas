@@ -168,8 +168,10 @@ Ext.define('SenChanvas.controller.phone.Main', {
                 scaleY: 1,
                 angle: 0,
                 x: x,
-                y: y
-            }
+                y: y,
+                lastAngle : null,
+                shadow:null
+            };
         me.setSelectedImage(newImage);
         me.addListeners(newImage, x, y);
         dragg.destroy();
@@ -188,7 +190,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
     addListeners:function(image, x, y){
         var me = this;
 
-        me.getTransformDetails()[image.id] = {
+        /*me.getTransformDetails()[image.id] = {
             scaleX: 1,
             scaleY: 1,
             angle: 0,
@@ -196,7 +198,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
             y: y,
             lastAngle : null,
             shadow:null
-        };
+        };*/
         console.log('transformDetails', me.getTransformDetails());
         image.on({
             pinch: {
@@ -299,6 +301,7 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
                 //se guarfa la referencia entre la imagen y su sombra
                 me.getTransformDetails()[image.id].shadow = imageShadow;
+                console.log('creado el shadow', me.getTransformDetails()[image.id].shadow);
 
                 //Estos son los detalles de imageShadow para ser utilizados cuando se manda a llamar updateTransform
                 me.getTransformDetails()[imageShadow.id] = {
