@@ -510,14 +510,29 @@ Ext.define('SenChanvas.controller.phone.Main', {
 
         me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
         me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + angle;
-        console.log(me.getTransformDetails()[image.id].angle);
-        var angleRot = Math.sin((me.getTransformDetails()[image.id].angle * Math.PI) / 180);
+        var angleRot = (me.getTransformDetails()[image.id].angle * Math.PI) / 180,
+            sd1X = image.getLeft()+image.getWidth() - image.getLeft(),
+            sd1y = image.getTop()+image.getHeight() - image.getTop(),
+            sdd1X = sd1X * Math.cos(angleRot) - sd1y * Math.sin(angleRot),
+            sdd1Y = sd1X * Math.sin(angleRot) + sd1y * Math.cos(angleRot),
+            snew1X = sdd1X + image.getLeft(),
+            snew1Y = sdd1Y + image.getTop(),
+            sd2X = image.getLeft()+image.getWidth() - image.getLeft(),
+            sd2y = image.getTop()+image.getHeight() - image.getTop(),
+            sdd2X = sd2X * Math.cos(angleRot) - sd2y * Math.sin(angleRot),
+            sdd2Y = sd2X * Math.sin(angleRot) + sd2y * Math.cos(angleRot),
+            snew2X = sdd2X + image.getLeft() + image.getWidth(),
+            snew2Y = sdd2Y + image.getTop() + image.getHeight();
 
-        console.log('angulo de rotacion',angleRot, me.getTransformDetails()[image.id].x,  me.getTransformDetails()[imageShadows[0].id].x, (me.getTransformDetails()[imageShadows[0].id].x * Math.cos(angleRot)) - (me.getTransformDetails()[imageShadows[0].id].y * Math.sin(angleRot)) + 10);
-        me.getTransformDetails()[imageShadows[0].id].x = (me.getTransformDetails()[imageShadows[0].id].x * Math.cos(angleRot)) - (me.getTransformDetails()[imageShadows[0].id].y * Math.sin(angleRot)) - 10;
-        me.getTransformDetails()[imageShadows[0].id].y = (me.getTransformDetails()[imageShadows[0].id].y * Math.cos(angleRot)) + (me.getTransformDetails()[imageShadows[0].id].x * Math.sin(angleRot)) - 10;
-        me.getTransformDetails()[imageShadows[1].id].x = ((me.getTransformDetails()[imageShadows[1].id].x) * Math.cos(angleRot)) - (me.getTransformDetails()[imageShadows[1].id].y * Math.sin(angleRot)) - 10;
-        me.getTransformDetails()[imageShadows[1].id].y = ((me.getTransformDetails()[imageShadows[1].id].y)* Math.cos(angleRot)) + (me.getTransformDetails()[imageShadows[1].id].x * Math.sin(angleRot)) - 10;
+
+        console.log('angulo de rotacion',angleRot, snew1X, snew1Y, snew2X, snew2Y);
+        me.getTransformDetails()[imageShadows[0].id].x = snew1X;
+        me.getTransformDetails()[imageShadows[0].id].y = snew1Y;
+        me.getTransformDetails()[imageShadows[1].id].x = snew2X;
+        me.getTransformDetails()[imageShadows[1].id].y = snew2Y;
+        //me.getTransformDetails()[imageShadows[1].id].x = ((me.getTransformDetails()[imageShadows[1].id].x) * Math.cos(angleRot)) - (me.getTransformDetails()[imageShadows[1].id].y * Math.sin(angleRot)) - 10;
+        //me.getTransformDetails()[imageShadows[1].id].y = ((me.getTransformDetails()[imageShadows[1].id].y)* Math.cos(angleRot)) + (me.getTransformDetails()[imageShadows[1].id].x * Math.sin(angleRot)) - 10;
+
         /*me.getTransformDetails()[imageShadows[0].id].lastAngle = me.getTransformDetails()[imageShadows[0].id].angle;
         me.getTransformDetails()[imageShadows[0].id].angle = me.getTransformDetails()[imageShadows[0].id].lastAngle + angle;
         me.getTransformDetails()[imageShadows[1].id].lastAngle = me.getTransformDetails()[imageShadows[1].id].angle;
