@@ -437,9 +437,12 @@ Ext.define('SenChanvas.controller.phone.Main', {
         me.setMinZIndex(zIndex);
     },
     onButtonDeleteTap:function(){
-        if(this.getSelected()){
-            this.getSelected().destroy();
-            this.getSelectedShadow().destroy();
+        var me = this,
+            image = me.getSelected(),
+            imageShadow = me.getTransformDetails()[image.id].shadow;
+        if(image){
+            image.destroy();
+            imageShadow.destroy();
         }
     },
     onClearButtonTap:function(){
