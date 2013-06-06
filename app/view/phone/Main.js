@@ -126,9 +126,6 @@ Ext.define('SenChanvas.view.phone.Main', {
                             src:"./resources/images/003.jpg",
                             height: 50,
                             width: 50
-                            /*getSrcImage:function(){
-                                return './resources/images/003.jpg';
-                            }*/
                         }]
                     }
                 ]
