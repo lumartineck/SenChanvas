@@ -570,37 +570,28 @@ Ext.define('SenChanvas.controller.phone.Main', {
     onExpandButtonTap: function () {
         var me = this,
             image = me.getSelected(),
-            imageShadow = me.getTransformDetails()[image.id].shadow;
+            imageShadows = me.getTransformDetails()[image.id].shadows;
 
         if (image) {
             var domElement = me.getDropCnt().element.dom,
                 dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
                 dropRigth = domElement.offsetLeft + domElement.offsetWidth,
-                scaleX = dropRigth / (image.getWidth() + 5),
-                scaleY = dropBottom / (image.getHeight() + 5),
+                scaleX = dropRigth / image.getWidth(),
+                scaleY = dropBottom / image.getHeight(),
                 scaledIncrementX = (((image.getWidth() * scaleX) - image.getWidth()) / 2),
                 scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2);
-
-                /*scaleShadowX = dropRigth / imageShadow.getWidth(),
-                scaleShadowY = dropBottom / imageShadow.getHeight(),
-                scaledIncrementShadowX = (((imageShadow.getWidth() * scaleShadowX) - imageShadow.getWidth()) / 2),
-                scaledIncrementShadowY = (((imageShadow.getWidth() * scaleShadowY) - imageShadow.getWidth()) / 2);*/
 
             me.getTransformDetails()[image.id].scaleX = scaleX;
             me.getTransformDetails()[image.id].scaleY = scaleY;
 
-            /*me.getTransformDetails()[imageShadow.id].scaleX = scaleShadowX;
-            me.getTransformDetails()[imageShadow.id].scaleY = scaleShadowY;*/
+            me.getTransformDetails()[image.id].x = domElement.offsetLeft + scaledIncrementX - 5;
+            me.getTransformDetails()[image.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementY - 10;
 
-            me.getTransformDetails()[image.id].x = domElement.offsetLeft + scaledIncrementX + 10;
-            me.getTransformDetails()[image.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementY + 5;
-
-            /*me.getTransformDetails()[imageShadow.id].x = domElement.offsetLeft + scaledIncrementShadowX - 2;
-            me.getTransformDetails()[imageShadow.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementShadowY - 10;*/
             console.log(me.getTransformDetails()[image.id]);
-            //console.log(me.getTransformDetails()[imageShadow.id]);
             me.updateTransform(image);
-            //me.updateTransform(imageShadow);
+
+            imageShadows[0].destroy();
+            imageShadows[1].destroy();
         }
     }
 });
