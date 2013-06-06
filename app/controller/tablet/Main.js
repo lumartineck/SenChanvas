@@ -145,6 +145,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
         console.log('Dropped', arguments);
         var dropCnt = me.getDropCnt();
         var dragg = Ext.getCmp(draggable.getElement().getId());
+
         console.log('AQUI', dragg, draggable);
 
             if (!droppable.cleared) {
@@ -168,8 +169,10 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                 scaleY: 1,
                 angle: 0,
                 x: x,
-                y: y
-            }
+                y: y,
+                lastAngle : null,
+                shadow:null
+            };
         me.setSelectedImage(newImage);
         me.addListeners(newImage, x, y);
         dragg.destroy();
@@ -188,25 +191,23 @@ Ext.define('SenChanvas.controller.tablet.Main', {
     addListeners:function(image, x, y){
         var me = this;
 
-        me.getTransformDetails()[image.id] = {
-            scaleX: 1,
-            scaleY: 1,
-            angle: 0,
-            x: x,
-            y: y,
-            lastAngle : null,
-            shadow:null
-        };
         console.log('transformDetails', me.getTransformDetails());
         image.on({
             pinch: {
                 element: 'element',
                 fn: function (e) {
                     me.setSelectedImage(image);
+                    var imageShadows = me.getTransformDetails()[image.id].shadows;
                     // Get the scale property from the event
                     me.getTransformDetails()[image.id].scaleX = e.scale;
                     me.getTransformDetails()[image.id].scaleY = e.scale;
+                    me.getTransformDetails()[imageShadows[0].id].scaleX = e.scale;
+                    me.getTransformDetails()[imageShadows[0].id].scaleY = e.scale;
+                    me.getTransformDetails()[imageShadows[1].id].scaleX = e.scale;
+                    me.getTransformDetails()[imageShadows[1].id].scaleY = e.scale;
                     me.updateTransform(image);
+                    me.updateTransform(imageShadows[0]);
+                    me.updateTransform(imageShadows[1]);
                 },
                 scope:me
             },
@@ -214,7 +215,10 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                 element: 'element',
                 fn: function (e) {
                     me.setSelectedImage(image);
+                    var imageShadows = me.getTransformDetails()[image.id].shadows;
                     me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
+                    me.getTransformDetails()[imageShadows[0].id].lastAngle = me.getTransformDetails()[imageShadows[0].id].angle;
+                    me.getTransformDetails()[imageShadows[1].id].lastAngle = me.getTransformDetails()[imageShadows[1].id].angle;
                 },
                 scope:me
             },
@@ -222,8 +226,13 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                 element: 'element',
                 fn: function (e) {
                     me.setSelectedImage(image);
+                    var imageShadows = me.getTransformDetails()[image.id].shadows;
                     me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + e.rotation;
+                    me.getTransformDetails()[imageShadows[0].id].angle = me.getTransformDetails()[imageShadows[0].id].lastAngle + e.rotation;
+                    me.getTransformDetails()[imageShadows[1].id].angle = me.getTransformDetails()[imageShadows[1].id].lastAngle + e.rotation;
                     me.updateTransform(image);
+                    me.updateTransform(imageShadows[0]);
+                    me.updateTransform(imageShadows[1]);
                 },
                 scope:me
             },
@@ -246,22 +255,24 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                     console.log(domElement.offsetTop, limitTop, domElement.offsetLeft, limitLeft, dropRigth, limitRight, dropBottom, limitBottom);
 
                     me.setSelectedImage(image);
-                    var imageSom = me.getTransformDetails()[image.id].shadow
+                    var imageShadows = me.getTransformDetails()[image.id].shadows
                     if(domElement.offsetTop < limitTop
                         && dropBottom > limitBottom){
-                        console.log('entro limite top bottom');
+                        console.log('entro limite top bottom', me.getTransformDetails()[imageShadows[0].id].y,me.getTransformDetails()[imageShadows[1].id].y, e.previousDeltaY);
                         me.getTransformDetails()[image.id].y += e.previousDeltaY;
-                        me.getTransformDetails()[imageSom.id].y += e.previousDeltaY // aca esta bien cambiar la coordenada solo que pienso que debes de darle un poquito mas arriba o algo asi pero ya veras tu
+                        me.getTransformDetails()[imageShadows[0].id].y += e.previousDeltaY;
+                        me.getTransformDetails()[imageShadows[1].id].y += e.previousDeltaY;
                     }
                     if(domElement.offsetLeft < limitLeft
                         && dropRigth > limitRight){
-                        console.log('entro limite left rigth');
+                        console.log('entro limite left rigth', me.getTransformDetails()[imageShadows[0].id].x, me.getTransformDetails()[imageShadows[1].id].x,  e.previousDeltaX);
                         me.getTransformDetails()[image.id].x += e.previousDeltaX;
-                        me.getTransformDetails()[imageSom.id].x += e.previousDeltaX;
+                        me.getTransformDetails()[imageShadows[0].id].x += e.previousDeltaX;
+                        me.getTransformDetails()[imageShadows[1].id].x += e.previousDeltaX;
                     }
-                    //me.getTransformDetails()[image.id].scale = 1.5;
                     me.updateTransform(image);
-                    me.updateTransform(imageSom);
+                    me.updateTransform(imageShadows[0]);
+                    me.updateTransform(imageShadows[1]);
                 },
                 scope:me
             },
@@ -278,26 +289,38 @@ Ext.define('SenChanvas.controller.tablet.Main', {
     setSelectedImage:function(image){
         var me =this,
             dropCnt = me.getDropCnt();
-        //console.log('setSelected', me.getTransformDetails()[image.id], image);
+            console.log('entrooooo');
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
                 var xL = me.getTransformDetails()[image.id].x -10,
-                    yL = me.getTransformDetails()[image.id].y -10;
-                var imageShadow = dropCnt.add({
+                    yL = me.getTransformDetails()[image.id].y -10,
+                    xR = (me.getTransformDetails()[image.id].x + image.getWidth()) - 10,
+                    yR = (me.getTransformDetails()[image.id].y + image.getHeight()) - 10;
+                if(!me.getTransformDetails()[image.id].shadows){
+                var imageShadows = [dropCnt.add({
                     xtype: 'component',
                     top: yL,
                     left: xL,
-                    width: 120,
-                    height: 120,
-                    style: "background-image: url('./resources/images/border4.png'); background-size:120px 120px; background-repeat:no-repeat"
-                });
-                imageShadow.setZIndex(image._zIndex - 1);
+                    width: 20,
+                    height: 20,
+                    style: "background-image: url('./resources/images/corner.png'); background-size:20px 20px; background-repeat:no-repeat"
+                }),dropCnt.add({
+                    xtype: 'component',
+                    top: yR,
+                    left: xR,
+                    width: 20,
+                    height: 20,
+                    style: "background-image: url('./resources/images/corner.png'); background-size:20px 20px; background-repeat:no-repeat"
+                })];
 
-                //se guarfa la referencia entre la imagen y su sombra
-                me.getTransformDetails()[image.id].shadow = imageShadow;
+                console.log(imageShadows);
+                imageShadows[0].setZIndex(image._zIndex + 1);
+                imageShadows[1].setZIndex(image._zIndex + 1);
 
-                //Estos son los detalles de imageShadow para ser utilizados cuando se manda a llamar updateTransform
-                me.getTransformDetails()[imageShadow.id] = {
+                me.getTransformDetails()[image.id].shadows = imageShadows;
+                console.log('creado el shadow', me.getTransformDetails()[image.id].shadows);
+
+                me.getTransformDetails()[imageShadows[0].id] = {
                     scaleX: 1,
                     scaleY: 1,
                     angle: 0,
@@ -306,54 +329,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                     lastAngle : null
                 };
 
-                imageShadow.on({
-                    drag: {
-                        element: 'element',
-                        fn: function (e, node) {
-                            console.log('eeee',e);
-                            //if( e.getTarget('div.circleBase')){
-                                var scaleX =  e.pageX / e.startX,
-                                    scaleY =  e.startY / e.pageY;
-
-                            console.log('icon',imageShadow);
-                            console.log('scale', scaleX, scaleY);
-                                /*var scaleImageX =
-                                    scaleImageY = */
-                                me.getTransformDetails()[imageShadow.id].scaleX = scaleX;
-                                me.getTransformDetails()[imageShadow.id].scaleY = scaleY;
-                                me.getTransformDetails()[image.id].scaleX = scaleX;
-                                me.getTransformDetails()[image.id].scaleY = scaleY;
-                                me.updateTransform(imageShadow);
-                                me.updateTransform(image);
-
-                                /*var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
-                                    valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
-                                    valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
-                                    valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
-
-                                console.log('transsformer',valorX, valorY);
-                                /*me.getTransformDetails()[iconTopLeft.id].x = (me.getTransformDetails()[image.id].x - valorX) - 12;
-                                me.getTransformDetails()[iconTopLeft.id].y = (me.getTransformDetails()[image.id].y - valorY) - 10;
-                                me.updateTransform(iconTopLeft);*/
-                            //}
-                        }
-                    }
-                });
-
-                /*var xR = image.element.dom.offsetLeft + (image.element.dom.clientHeight - 9),
-                    yR = image.element.dom.offsetTop + (image.element.dom.clientHeight - 7);
-
-
-                var iconBottomRight = dropCnt.add({
-                    xtype: 'container',
-                    top: yR,
-                    left: xR,
-                    width: 20,
-                    height: 20,
-                    cls: 'circleBase circle'
-                });
-
-                me.getTransformDetails()[iconBottomRight.id] = {
+                me.getTransformDetails()[imageShadows[1].id] = {
                     scaleX: 1,
                     scaleY: 1,
                     angle: 0,
@@ -361,39 +337,130 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                     y: yR,
                     lastAngle : null
                 };
-
-                iconBottomRight.on({
+                imageShadows[0].on({
                     drag: {
                         element: 'element',
                         fn: function (e, node) {
-                            if( e.getTarget('div.circleBase')){
-                                var scaleX = e.pageX / e.startX,
-                                    scaleY = e.pageY / e.startY;
+                            var scaleX, scaleY,
+                                centroX, centroY;
+
+                            centroX = me.getTransformDetails()[imageShadows[1].id].x + (image.getWidth() / 2);
+                            centroY = me.getTransformDetails()[image.id].y + (image.getHeight() / 2);
+
+                            console.log('centroX',centroX);
+                            console.log('centroY', centroY);
+
+
+
+                            if(e.pageX > e.startX){
+                                if (centroX < e.pageX){
+                                scaleX =  e.pageX / e.startX;
+                                } else {
+                                console.log('1111', e.pageX, e.startX);
+                                scaleX = e.startX / e.pageX;
+                                }
+                            } else {
+                                console.log('2222', e.pageX, e.startX);
+                                scaleX =  e.startX / e.pageX;
+                            }
+
+
+                            if(e.pageY > e.startY){
+                                if (centroY < e.pageY){
+                                scaleY = e.pageY / e.startY;
+                                } else {
+                                console.log('3333', e.pageY, e.startY);
+                                scaleY = e.startY / e.pageY;
+                                }
+                            } else {
+                                console.log('4444', e.pageY, e.startY);
+                                scaleY = e.startY / e.pageY;
+                            }
+
+                            if(centroX < e.pageX){
+                                console.log('entra a la mitad');
+                                scaleX = scaleX * -1;
+                                console.log(scaleX);
+                            }
+
+                            if(centroY < e.pageY){
+                                console.log('entra a la mitad');
+                                scaleY = scaleY * -1;
+                                console.log('scaleYYY',scaleY);
+                            }
+
+
+                            var scaledIncrementX = (((image.getWidth() * scaleX) - image.getWidth()) / 2),
+                                scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2);
+
+                            console.log('scale', e.pageX, e.startX, e.pageY, e.startY, scaleX, scaleY, scaledIncrementX, scaledIncrementY);
+                                me.getTransformDetails()[imageShadows[0].id].x = me.getTransformDetails()[image.id].x - scaledIncrementX - 10;
+                                me.getTransformDetails()[imageShadows[0].id].y = me.getTransformDetails()[image.id].y - scaledIncrementY - 10;
+                                me.getTransformDetails()[imageShadows[1].id].x = (me.getTransformDetails()[image.id].x + image.getWidth()) + scaledIncrementX - 10;
+                                me.getTransformDetails()[imageShadows[1].id].y = (me.getTransformDetails()[image.id].y + image.getHeight()) + scaledIncrementY - 10;
                                 me.getTransformDetails()[image.id].scaleX = scaleX;
                                 me.getTransformDetails()[image.id].scaleY = scaleY;
+                                me.updateTransform(imageShadows[0]);
+                                me.updateTransform(imageShadows[1]);
                                 me.updateTransform(image);
-
-                                var valX = me.getTransformDetails()[image.id].scaleX * me.getTransformDetails()[image.id].x,
-                                    valorX = (valX - me.getTransformDetails()[image.id].x ) / me.getTransformDetails()[image.id].scaleX,
-                                    valY = me.getTransformDetails()[image.id].scaleY * me.getTransformDetails()[image.id].y,
-                                    valorY = (valY - me.getTransformDetails()[image.id].y) / me.getTransformDetails()[image.id].scaleY;
-
-                                console.log('transsformer',valorX, valorY);
-                                me.getTransformDetails()[iconBottomRight.id].x = (me.getTransformDetails()[image.id].x + image.element.dom.clientHeight + valorX);
-                                me.getTransformDetails()[iconBottomRight.id].y = (me.getTransformDetails()[image.id].y + image.element.dom.clientHeight + valorY);
-                                me.updateTransform(iconBottomRight);
-                            }
                         }
                     }
-                });*/
+                });
+
+                imageShadows[1].on({
+                    drag: {
+                        element: 'element',
+                        fn: function (e, node) {
+                            var scaleX, scaleY;
+
+                            if(e.pageX > e.startX){
+                                console.log('1111', e, e.pageX, e.startX);
+                                scaleX = e.pageX / e.startX;
+                            } else {
+                                console.log('2222', e, e.pageX, e.startX);
+                                scaleX =  e.pageX / e.startX;
+                            }
+                            if(e.pageY > e.startY){
+                                console.log('3333', e, e.pageX, e.startY);
+                                scaleY = e.pageY / e.startY;
+                            } else {
+                                console.log('4444', e, e.pageX, e.startY);
+                                scaleY = e.pageY / e.startY;
+                            }
+
+                            var scaledIncrementX = (((image.getWidth() * scaleX) - image.getWidth()) / 2),
+                                scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2);
+
+                            console.log('scale', e.pageX, e.startX, e.pageY, e.startY, scaleX, scaleY, scaledIncrementX, scaledIncrementY);
+                            me.getTransformDetails()[imageShadows[1].id].x = (me.getTransformDetails()[image.id].x + image.getWidth()) + scaledIncrementX - 10;
+                            me.getTransformDetails()[imageShadows[1].id].y = (me.getTransformDetails()[image.id].y + image.getHeight()) + scaledIncrementY - 10;
+                            me.getTransformDetails()[imageShadows[0].id].x = me.getTransformDetails()[image.id].x - scaledIncrementX - 10;
+                            me.getTransformDetails()[imageShadows[0].id].y = me.getTransformDetails()[image.id].y - scaledIncrementY - 10;
+                            me.getTransformDetails()[image.id].scaleX = scaleX;
+                            me.getTransformDetails()[image.id].scaleY = scaleY;
+                            me.updateTransform(imageShadows[1]);
+                            me.updateTransform(imageShadows[0]);
+                            me.updateTransform(image);
+                        }
+                    }
+                });
+                } else {
+                    me.getTransformDetails()[image.id].shadows[0].setHidden(false);
+                    me.getTransformDetails()[image.id].shadows[1].setHidden(false);
+                }
+            } else {
+                if(me.getTransformDetails()[item.id].shadows){
+                    me.getTransformDetails()[item.id].shadows[0].setHidden(true);
+                    me.getTransformDetails()[item.id].shadows[1].setHidden(true);
+                }
             }
+
         });
         me.setSelected(image);
     },
 
     updateTransform:function(image){
         var me = this;
-        //console.log('update', me.getTransformDetails()[image.id]);
         image.element.setStyle('-webkit-transform', 'scaleX(' + me.getTransformDetails()[image.id].scaleX
             + ') scaleY(' + me.getTransformDetails()[image.id].scaleY + ') rotate('
             + me.getTransformDetails()[image.id].angle + 'deg)');
@@ -404,11 +471,9 @@ Ext.define('SenChanvas.controller.tablet.Main', {
 
     onItemTouchStart:function ( dataview, index, target, record, e, eOpts ) {
 
-        // alert('touchstart');
         Ext.create('Ext.util.Draggable', {
             element: "image-"+record.get('id'),
             threshold: 0,
-            //direction: 'vertical',
             animationDuration: 100,
             draggable: true,
             listeners:{
@@ -423,7 +488,6 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                 }
             }
         });
-        // Ext.get("image-"+record.get('id')).hide();
     },
 
 
@@ -441,30 +505,59 @@ Ext.define('SenChanvas.controller.tablet.Main', {
 
     rotate:function(angle){
         var me = this,
-            image = me.getSelected();
-        console.log('rotate', me.getTransformDetails());
+            image = me.getSelected(),
+            imageShadows = me.getTransformDetails()[image.id].shadows;
+
         me.getTransformDetails()[image.id].lastAngle = me.getTransformDetails()[image.id].angle;
         me.getTransformDetails()[image.id].angle = me.getTransformDetails()[image.id].lastAngle + angle;
+        console.log(me.getTransformDetails()[image.id].angle);
+        var angleRot = Math.sin((me.getTransformDetails()[image.id].angle * Math.PI) / 180);
+
+        console.log('angulo de rotacion',angleRot, me.getTransformDetails()[image.id].x,  me.getTransformDetails()[imageShadows[0].id].x, (me.getTransformDetails()[imageShadows[0].id].x * Math.cos(angleRot)) - (me.getTransformDetails()[imageShadows[0].id].y * Math.sin(angleRot)) + 10);
+        me.getTransformDetails()[imageShadows[0].id].x = (me.getTransformDetails()[imageShadows[0].id].x * Math.cos(angleRot)) - (me.getTransformDetails()[imageShadows[0].id].y * Math.sin(angleRot)) - 10;
+        me.getTransformDetails()[imageShadows[0].id].y = (me.getTransformDetails()[imageShadows[0].id].y * Math.cos(angleRot)) + (me.getTransformDetails()[imageShadows[0].id].x * Math.sin(angleRot)) - 10;
+        me.getTransformDetails()[imageShadows[1].id].x = ((me.getTransformDetails()[imageShadows[1].id].x) * Math.cos(angleRot)) - (me.getTransformDetails()[imageShadows[1].id].y * Math.sin(angleRot)) - 10;
+        me.getTransformDetails()[imageShadows[1].id].y = ((me.getTransformDetails()[imageShadows[1].id].y)* Math.cos(angleRot)) + (me.getTransformDetails()[imageShadows[1].id].x * Math.sin(angleRot)) - 10;
+        /*me.getTransformDetails()[imageShadows[0].id].lastAngle = me.getTransformDetails()[imageShadows[0].id].angle;
+        me.getTransformDetails()[imageShadows[0].id].angle = me.getTransformDetails()[imageShadows[0].id].lastAngle + angle;
+        me.getTransformDetails()[imageShadows[1].id].lastAngle = me.getTransformDetails()[imageShadows[1].id].angle;
+        me.getTransformDetails()[imageShadows[1].id].angle = me.getTransformDetails()[imageShadows[1].id].lastAngle + angle;*/
         me.updateTransform(image);
+        me.updateTransform(imageShadows[0]);
+        me.updateTransform(imageShadows[1]);
     },
 
     onButtonToFrontTap:function(){
         var me = this,
             image = me.getSelected(),
+            imageShadows = me.getTransformDetails()[image.id].shadows,
             zIndex = me.getMaxZIndex()?me.getMaxZIndex()+1:100;
+
         image.setZIndex(zIndex);
+        imageShadows[0].setZIndex(image.getZIndex() + 1);
+        imageShadows[1].setZIndex(image.getZIndex() + 1);
         me.setMaxZIndex(zIndex);
     },
     onButtonToBackTap:function(){
         var me = this,
             image = me.getSelected(),
+            imageShadows = me.getTransformDetails()[image.id].shadows,
             zIndex = (me.getMinZIndex() || me.getMinZIndex() == 0) ? me.getMinZIndex()-1 : 0;
+
         image.setZIndex(zIndex);
+        imageShadows[0].setZIndex(image.getZIndex() + 1);
+        imageShadows[1].setZIndex(image.getZIndex() + 1);
         me.setMinZIndex(zIndex);
     },
     onButtonDeleteTap:function(){
-        if(this.getSelected()){
-            this.getSelected().destroy();
+        var me = this,
+            image = me.getSelected(),
+            imageShadows = me.getTransformDetails()[image.id].shadows;
+
+        if(me.getSelected()){
+            me.getSelected().destroy();
+            imageShadows[0].destroy();
+            imageShadows[1].destroy();
         }
     },
     onClearButtonTap:function(){
@@ -474,7 +567,40 @@ Ext.define('SenChanvas.controller.tablet.Main', {
 
         me.createContImages();
     },
-    onExpandButtonTap:function(){
+    onExpandButtonTap: function () {
+        var me = this,
+            image = me.getSelected(),
+            imageShadow = me.getTransformDetails()[image.id].shadow;
 
+        if (image) {
+            var domElement = me.getDropCnt().element.dom,
+                dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
+                dropRigth = domElement.offsetLeft + domElement.offsetWidth,
+                scaleX = dropRigth / (image.getWidth() + 5),
+                scaleY = dropBottom / (image.getHeight() + 5),
+                scaledIncrementX = (((image.getWidth() * scaleX) - image.getWidth()) / 2),
+                scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2);
+
+                /*scaleShadowX = dropRigth / imageShadow.getWidth(),
+                scaleShadowY = dropBottom / imageShadow.getHeight(),
+                scaledIncrementShadowX = (((imageShadow.getWidth() * scaleShadowX) - imageShadow.getWidth()) / 2),
+                scaledIncrementShadowY = (((imageShadow.getWidth() * scaleShadowY) - imageShadow.getWidth()) / 2);*/
+
+            me.getTransformDetails()[image.id].scaleX = scaleX;
+            me.getTransformDetails()[image.id].scaleY = scaleY;
+
+            /*me.getTransformDetails()[imageShadow.id].scaleX = scaleShadowX;
+            me.getTransformDetails()[imageShadow.id].scaleY = scaleShadowY;*/
+
+            me.getTransformDetails()[image.id].x = domElement.offsetLeft + scaledIncrementX + 10;
+            me.getTransformDetails()[image.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementY - 4;
+
+            /*me.getTransformDetails()[imageShadow.id].x = domElement.offsetLeft + scaledIncrementShadowX - 2;
+            me.getTransformDetails()[imageShadow.id].y = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + scaledIncrementShadowY - 10;*/
+            console.log(me.getTransformDetails()[image.id]);
+            //console.log(me.getTransformDetails()[imageShadow.id]);
+            me.updateTransform(image);
+            //me.updateTransform(imageShadow);
+        }
     }
 });
