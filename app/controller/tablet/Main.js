@@ -24,12 +24,12 @@ Ext.define('SenChanvas.controller.tablet.Main', {
             '#principalPanel': {
                 show: 'onShowPrincipal'
             },
-            draggsCnt: {
+            draggable: {
                 initialize: 'onDraggsCntInit'
             },
             /*dropCnt: {
              initialize: 'onDropCntInit'
-             },*/
+            },*/
             imagesDataview:{
                 itemtouchstart:'onItemTouchStart'
             },
@@ -57,39 +57,20 @@ Ext.define('SenChanvas.controller.tablet.Main', {
         }
     },
 
-    init: function() {
-        Ext.getStore('Images').load();
-
-        //Ext.getStore('Images').on('load',this.createContImages.bind(this));
-    },
-
-    createContImages: function () {
-        Ext.getStore('Images').each(function (item, index, lenght){
-            var src = item.get('src'),
-                cnt = Ext.getCmp('draggsCnt');
-            console.log('connnn',cnt)
-            cnt.add({
-                xtype: 'image',
-                draggable: true,
-                src: src,
-                height: 100,
-                width: 100
-            });
-        });
-    },
-
     onDraggsCntInit: function(cnt) {
         var me = this,
-            drop = me.getDropCnt();
-
+            store = Ext.getStore('Images'),
+            drag = me.getDraggable();
         console.log('Init draggs');
-        cnt.on('painted',function(){
+
+        store.on('load', function () {
             Ext.each(cnt.getInnerItems(), function(item) {
                 if (Ext.isDefined(item.draggableBehavior)) {
                     var draggable = item.draggableBehavior.getDraggable();
 
                     draggable.group = 'base';// Default group for droppable
                     draggable.revert = true;
+                    draggable.direction = 'vertical';
 
                     draggable.setConstraint({
                         min: { x: -Infinity, y: -Infinity },
@@ -103,9 +84,10 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                     });
                 }
             });
-        });
 
-        me.onDropCntInit();
+            me.onDropCntInit();
+        });
+        store.load();
     },
 
     onDragStart: function() {
@@ -118,14 +100,13 @@ Ext.define('SenChanvas.controller.tablet.Main', {
         console.log('End of dragging', arguments);
     },
 
-    onDropCntInit: function() {
-        var me = this,
-            el = Ext.getCmp('dropable');
+    onDropCntInit: function(cnt) {
+        var me = this;
 
         var drop = Ext.create('Ext.ux.util.Droppable', {
-            element: el.element
+            element: 'dropable'
         });
-        console.log('drop..', drop);
+
         drop.on({
             scope: me,
             drop: me.onDrop
@@ -143,7 +124,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
             heightNavigationBar = me.getNavigationBar().element.dom.offsetHeight,
             heightButtons = me.getButtonsAct().element.dom.offsetHeight;
         console.log('Dropped', arguments);
-        var dropCnt = me.getDropCnt();
+        var dropCnt = me.getDropable();
         var dragg = Ext.getCmp(draggable.getElement().getId());
 
         console.log('AQUI', dragg, draggable);
@@ -239,7 +220,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
             drag: {
                 element: 'element',
                 fn: function (e) {
-                    var domElement = me.getDropCnt().element.dom,
+                    var domElement = me.getDropable().element.dom,
                         scaleX = me.getTransformDetails()[image.id].scaleX,
                         scaleY = me.getTransformDetails()[image.id].scaleY,
                         scaledIncrementX = (((image.getHeight() * scaleX) - image.getHeight()) / 2),
@@ -288,7 +269,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
 
     setSelectedImage:function(image){
         var me =this,
-            dropCnt = me.getDropCnt();
+            dropCnt = me.getDropable();
             console.log('entrooooo');
         Ext.each(dropCnt.getItems().items, function(item){
             if(item.id == image.id) {
@@ -345,7 +326,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                                 centroX, centroY;
 
                             centroX = me.getTransformDetails()[imageShadows[1].id].x + (image.getWidth() / 2);
-                            centroY = me.getTransformDetails()[image.id].y + (image.getHeight() / 2);
+                            centroY = me.getTransformDetails()[image.id].y + (image.getHeight() / 2) - 30;
 
                             console.log('centroX',centroX);
                             console.log('centroY', centroY);
@@ -356,11 +337,11 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                                 if (centroX < e.pageX){
                                 scaleX =  e.pageX / e.startX;
                                 } else {
-                                console.log('1111', e.pageX, e.startX);
+                                //console.log('1111', e.pageX, e.startX);
                                 scaleX = e.startX / e.pageX;
                                 }
                             } else {
-                                console.log('2222', e.pageX, e.startX);
+                                //console.log('2222', e.pageX, e.startX);
                                 scaleX =  e.startX / e.pageX;
                             }
 
@@ -369,18 +350,18 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                                 if (centroY < e.pageY){
                                 scaleY = e.pageY / e.startY;
                                 } else {
-                                console.log('3333', e.pageY, e.startY);
+                                //console.log('3333', e.pageY, e.startY);
                                 scaleY = e.startY / e.pageY;
                                 }
                             } else {
-                                console.log('4444', e.pageY, e.startY);
+                                //console.log('4444', e.pageY, e.startY);
                                 scaleY = e.startY / e.pageY;
                             }
 
                             if(centroX < e.pageX){
-                                console.log('entra a la mitad');
+                                //console.log('entra a la mitad');
                                 scaleX = scaleX * -1;
-                                console.log(scaleX);
+                                //console.log(scaleX);
                             }
 
                             if(centroY < e.pageY){
@@ -393,7 +374,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
                             var scaledIncrementX = (((image.getWidth() * scaleX) - image.getWidth()) / 2),
                                 scaledIncrementY = (((image.getHeight() * scaleY) - image.getHeight()) / 2);
 
-                            console.log('scale', e.pageX, e.startX, e.pageY, e.startY, scaleX, scaleY, scaledIncrementX, scaledIncrementY);
+                            console.log('scale', e.pageY, e.startY, scaleX, scaleY, scaledIncrementX, scaledIncrementY);
                                 me.getTransformDetails()[imageShadows[0].id].x = me.getTransformDetails()[image.id].x - scaledIncrementX - 10;
                                 me.getTransformDetails()[imageShadows[0].id].y = me.getTransformDetails()[image.id].y - scaledIncrementY - 10;
                                 me.getTransformDetails()[imageShadows[1].id].x = (me.getTransformDetails()[image.id].x + image.getWidth()) + scaledIncrementX - 10;
@@ -562,6 +543,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
     },
     onClearButtonTap:function(){
         var me = this,
+            dropCnt = me.getDraggable(),
             droppable = me.getMain().down('#dropable');
         droppable.removeAll(true,true);
 
@@ -573,7 +555,7 @@ Ext.define('SenChanvas.controller.tablet.Main', {
             imageShadow = me.getTransformDetails()[image.id].shadow;
 
         if (image) {
-            var domElement = me.getDropCnt().element.dom,
+            var domElement = me.getDropable().element.dom,
                 dropBottom = domElement.offsetTop - me.getButtonsAct().element.dom.offsetHeight + domElement.offsetHeight,
                 dropRigth = domElement.offsetLeft + domElement.offsetWidth,
                 scaleX = dropRigth / (image.getWidth() + 5),

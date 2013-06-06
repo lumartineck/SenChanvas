@@ -69,64 +69,9 @@ Ext.define('SenChanvas.view.phone.Main', {
                         margin: '3 5 3 5'
                     },
                     {
-                        xtype: 'container',
-                        id: 'draggsCnt',
-                        layout: 'hbox',
-                        flex: 1,
-                        style: {
-                            'border' : 'solid 1px #D7D9DE',
-                            'border-radius' : '9px'
-                        },
-                        margin: '3 5 3 5',
-                        items: [{
-                            xtype: 'image',
-                            draggable: true,
-                            src:"./resources/images/001.jpg",
-                            height: 50,
-                            width: 50
-                        },{
-                            xtype: 'image',
-                            draggable: true,
-                            src:"./resources/images/002.jpg",
-                            height: 50,
-                            width: 50
-                        },{
-                            xtype: 'image',
-                            draggable: true,
-                            src:"./resources/images/003.jpg",
-                            height: 50,
-                            width: 50
-                        },{
-                            xtype: 'image',
-                            draggable: true,
-                            src:"./resources/images/004.jpg",
-                            height: 50,
-                            width: 50
-                        },{
-                            xtype: 'image',
-                            draggable: true,
-                            src:"./resources/images/005.jpg",
-                            height: 50,
-                            width: 50
-                        },{
-                            xtype: 'image',
-                            draggable: true,
-                            src:"./resources/images/001.jpg",
-                            height: 50,
-                            width: 50
-                        },{
-                            xtype: 'image',
-                            draggable: true,
-                            src: "./resources/images/002.jpg",
-                            height: 50,
-                            width: 50
-                        },{
-                            xtype: 'image',
-                            draggable: true,
-                            src:"./resources/images/003.jpg",
-                            height: 50,
-                            width: 50
-                        }]
+                        xtype: 'imagesdataview',
+                        flex:1,
+                        id: 'draggable'
                     }
                 ]
             }
