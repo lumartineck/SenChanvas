@@ -64,26 +64,74 @@ Ext.define('SenChanvas.controller.phone.Main', {
         console.log('Init draggs');
 
         store.on('load', function () {
-            Ext.each(cnt.getInnerItems(), function(item) {
-                if (Ext.isDefined(item.draggableBehavior)) {
-                    var draggable = item.draggableBehavior.getDraggable();
 
-                    draggable.group = 'base';// Default group for droppable
-                    draggable.revert = true;
-                    draggable.direction = 'vertical';
+            var makeIt = function(item) {
+                    if (Ext.isDefined(item.draggableBehavior)) {
+                        var draggable = item.draggableBehavior.getDraggable();
 
-                    draggable.setConstraint({
-                        min: { x: -Infinity, y: -Infinity },
-                        max: { x: Infinity, y: Infinity }
+                        draggable.group = 'base';// Default group for droppable
+                        draggable.revert = true;
+                        draggable.direction = 'vertical';
+                        item.setZIndex( 5 );
+
+                        draggable.setConstraint({
+                            min: { x: -Infinity, y: -Infinity },
+                            max: { x: Infinity, y: Infinity }
+                        });
+
+                        draggable.on({
+                            scope: me,
+                            dragstart: me.onDragStart,
+                            dragend: me.onDragEnd
+                        });
+                    }
+                };
+
+
+             setTimeout(function (argument) {
+
+                store.each(function (item) {
+                   var img = Ext.create('Ext.Img', {
+                        src: item.get('src'),
+                        height: 64,
+                        width: 64,
+                        renderTo:Ext.get('image-'+item.get('id')),
+                         style: {
+                                'border' : 'solid 1px #3CA9D0',
+                                'border' : 'solid 1px #FFF',
+                                'border-radius' : '5px',
+                                'z-index': '3 !important'
+                            },
+                        draggable: true
                     });
+                    makeIt(img);
+                });                
+                me.onDropCntInit();
+            },1000);
 
-                    draggable.on({
-                        scope: me,
-                        dragstart: me.onDragStart,
-                        dragend: me.onDragEnd
-                    });
-                }
-            });
+            
+
+
+            // Ext.each(cnt.getInnerItems(), function(item) {
+            //     if (Ext.isDefined(item.draggableBehavior)) {
+            //         var draggable = item.draggableBehavior.getDraggable();
+
+            //         draggable.group = 'base';// Default group for droppable
+            //         draggable.revert = true;
+            //         draggable.direction = 'vertical';
+
+            //         draggable.setConstraint({
+            //             min: { x: -Infinity, y: -Infinity },
+            //             max: { x: Infinity, y: Infinity }
+            //         });
+
+            //         draggable.on({
+            //             scope: me,
+            //             dragstart: me.onDragStart,
+            //             dragend: me.onDragEnd
+            //         });
+            //     }
+            // });
 
             me.onDropCntInit();
         });

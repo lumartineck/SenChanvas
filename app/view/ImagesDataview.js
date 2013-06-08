@@ -19,36 +19,36 @@ Ext.define('SenChanvas.view.ImagesDataview', {
             wrap: false
         },
         layout: 'hbox',
-        /*itemTpl: [
+        itemTpl: [
                 '<div class="image-dataview-item" id="image-{id}" draggable="true" style="z-index:10;overflow:visible;">',
-                	'<div class="image" style="margin:5px;">',
-                		'<img src="{src}" style="width:50px; height:50px; z-index:2000;">',
-                	'</div>',
+                	// '<div class="image" style="margin:5px;">',
+                	// 	'<img src="{src}" style="width:50px; height:50px; z-index:2000;">',
+                	// '</div>',
                 '</div>'
-        ],*/
-        items:[
-            {
-                xtype: 'image',
-                src: './resources/images/001.jpg',
-                height:100,
-                width: 100,
-                draggable: true
-            },
-            {
-                xtype: 'image',
-                src: './resources/images/002.jpg',
-                height:100,
-                width: 100,
-                draggable: true
-            },
-            {
-                xtype: 'image',
-                src: './resources/images/003.jpg',
-                height:100,
-                width: 100,
-                draggable: true
-            }
-        ]
+        ],
+        // items:[
+        //     {
+        //         xtype: 'image',
+        //         src: './resources/images/001.jpg',
+        //         height:100,
+        //         width: 100,
+        //         draggable: true
+        //     },
+        //     {
+        //         xtype: 'image',
+        //         src: './resources/images/002.jpg',
+        //         height:100,
+        //         width: 100,
+        //         draggable: true
+        //     },
+        //     {
+        //         xtype: 'image',
+        //         src: './resources/images/003.jpg',
+        //         height:100,
+        //         width: 100,
+        //         draggable: true
+        //     }
+        // ]
     }/*,
 
     initialize: function () {
